@@ -42,7 +42,7 @@ const PaginatedTable = ({ initialData, initialTotalCount }: { initialData: Table
   const fetchData = useCallback(async (page: number, search: string) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/data?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/api/data/2023?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -99,35 +99,35 @@ const PaginatedTable = ({ initialData, initialTotalCount }: { initialData: Table
       {isLoading ? (
         <TableSkeleton />
       ) : (
-        <div className="flex justify-center items-center rounded-lg">
-        <Table className="border-2 max-h-[500px] overflow-y-auto rounded-lg">
-          <TableHeader>
-            <TableRow>
-              <TableHead>CET No</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Rank</TableHead>
-              <TableHead>Course</TableHead>
-              <TableHead>Course Code</TableHead>
-              <TableHead>Verified Category</TableHead>
-              <TableHead>Category Allotted</TableHead>
-              <TableHead>Course Fee</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody >
-            {data.map((item: TableData) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.cet_no}</TableCell>
-                <TableCell>{item.candidate_name}</TableCell>
-                <TableCell>{item.rank}</TableCell>
-                <TableCell>{item.course_name}</TableCell>
-                <TableCell>{item.course_code}</TableCell>
-                <TableCell>{item.verified_category}</TableCell>
-                <TableCell>{item.category_allotted}</TableCell>
-                <TableCell>{item.course_fee}</TableCell>
+        <div className=" rounded-md">
+          <Table className="border-2 max-h-[500px] overflow-y-auto">
+            <TableHeader className="">
+              <TableRow>
+                <TableHead>CET No</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Rank</TableHead>
+                <TableHead>Course</TableHead>
+                <TableHead>Course Code</TableHead>
+                <TableHead>Verified Category</TableHead>
+                <TableHead>Category Allotted</TableHead>
+                <TableHead>Course Fee</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody >
+              {data.map((item: TableData) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.cet_no}</TableCell>
+                  <TableCell>{item.candidate_name}</TableCell>
+                  <TableCell>{item.rank}</TableCell>
+                  <TableCell>{item.course_name}</TableCell>
+                  <TableCell>{item.course_code}</TableCell>
+                  <TableCell>{item.verified_category}</TableCell>
+                  <TableCell>{item.category_allotted}</TableCell>
+                  <TableCell>{item.course_fee}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 

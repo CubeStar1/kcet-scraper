@@ -32,8 +32,8 @@ const menuItems = [
     title: "Counselling",
     href: "/counselling",
     subItems: [
-      { title: "2023", href: "/counselling" },
-      { title: "2024", href: "/counselling" },
+      { title: "2023", href: "/counselling/2023" },
+      { title: "2024", href: "/counselling/2024" },
     ],
   },
   {
