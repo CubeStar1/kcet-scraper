@@ -28,6 +28,7 @@ export type TableData = {
   verified_category: string;
   category_allotted: string;
   course_fee: string;
+  serial_number_allotted_option: string;
 }
 
 const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData: TableData[], initialTotalCount: number, year: string })  => {
@@ -124,6 +125,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
                 <TableHead>Verified Category</TableHead>
                 <TableHead>Category Allotted</TableHead>
                 <TableHead>Course Fee</TableHead>
+                <TableHead>S. No. Allotted Option</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody >
@@ -137,6 +139,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
                   <TableCell>{item.verified_category}</TableCell>
                   <TableCell>{item.category_allotted}</TableCell>
                   <TableCell>{item.course_fee}</TableCell>
+                  <TableCell>{item.serial_number_allotted_option}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
