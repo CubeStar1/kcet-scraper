@@ -2,7 +2,7 @@
 import PaginatedTable from '@/components/PaginatedTable'
 
 async function getInitialData(page: number, pageSize: number) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/2023?page=${page}&pageSize=${pageSize}`, { cache:  'no-store' })
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/2024?page=${page}&pageSize=${pageSize}`, { cache:  'no-store' })
   if (!res.ok) {
     throw new Error('Failed to fetch data')
   }
@@ -18,9 +18,9 @@ export default async function Home({ searchParams }: { searchParams: { page: str
   return (
     <main className="container mx-auto p-4 max-h-screen">
       <h1 className="text-2xl font-bold mb-4" >
-        Candidate Data
+        Candidate Data: 2024
       </h1>
-      <PaginatedTable initialData={data} initialTotalCount={count} />
+      <PaginatedTable initialData={data} initialTotalCount={count} year="2024" />
     </main>
   )
 }

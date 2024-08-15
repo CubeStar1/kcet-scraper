@@ -27,7 +27,7 @@ const Page = () => {
             <SearchInput />
           </div>
           <p className="text-sm md:text-sm mb-8 max-w-2xl text-gray-400">
-            Last Scraped: 2024-03-15 at 12:00 PM
+            Last Scraped: 2024-08-15 at 12:00 PM
           </p>
         </div>
       </div>

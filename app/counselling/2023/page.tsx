@@ -18,9 +18,9 @@ export default async function Home({ searchParams }: { searchParams: { page: str
   return (
     <main className="container mx-auto p-4 max-h-screen">
       <h1 className="text-2xl font-bold mb-4" >
-        Candidate Data
+        Candidate Data: 2023
       </h1>
-      <PaginatedTable initialData={data} initialTotalCount={count} />
+      <PaginatedTable initialData={data} initialTotalCount={count} year="2023" />
     </main>
   )
 }

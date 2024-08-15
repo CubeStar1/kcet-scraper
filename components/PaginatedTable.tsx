@@ -26,7 +26,7 @@ export type TableData = {
   course_fee: string;
 }
 
-const PaginatedTable = ({ initialData, initialTotalCount }: { initialData: TableData[], initialTotalCount: number }) => {
+const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData: TableData[], initialTotalCount: number, year: string })  => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
@@ -42,7 +42,7 @@ const PaginatedTable = ({ initialData, initialTotalCount }: { initialData: Table
   const fetchData = useCallback(async (page: number, search: string) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/data/2023?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
+      const res = await fetch(`/api/data/${year}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }

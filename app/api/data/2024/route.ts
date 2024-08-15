@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   try {
     let query = supabase
-      .from('kcet_2023_r1_table')
+      .from('kcet_2024_m1_table')
       .select('*', { count: 'exact' });
 
     if (search) {
