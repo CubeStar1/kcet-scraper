@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css";
 import NextTopLoader from 'nextjs-toploader';
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
            shadow="0 0 10px #2299DD,0 0 5px #2299DD"
            />
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
