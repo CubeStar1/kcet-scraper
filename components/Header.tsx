@@ -32,7 +32,12 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <nav className="flex items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="ml-2 text-xl font-semibold">KCET Scraper</Link>
+            <div className="flex flex-col gap-2">
+              <Link href="/" className="ml-2 text-xl font-semibold">KCET Scraper</Link>
+              <div className="flex flex-row gap-2 justify-start items-start">
+                <p className="ml-2 text-sm text-white bg-green-600 px-2 py-1 rounded-xl">BETA</p>
+              </div>
+            </div>
           </div>
           <div className="hidden sm:flex items-center gap-2">
             <Navigation />
