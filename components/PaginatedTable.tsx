@@ -13,6 +13,10 @@ import {
 import TableSkeleton from './TableSkeleton';
 import SearchForm from './SearchForm';
 import TablePagination from './TablePagination';
+import { Button } from './ui/button';
+import Link from 'next/link';
+import { InfoIcon } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 export type TableData = {
   id: string;
@@ -81,6 +85,15 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
 
   return (
     <div>
+          <Card className="w-full flex-col">
+            <CardHeader>
+                <CardTitle className="flex flex-col gap-2 md:flex-row">
+                    <InfoIcon />
+                    <span className="text-sm md:text-base">All data has not been updated yet.</span>
+                    <span className="text-sm md:text-base"> Please check back later.</span>
+                </CardTitle>
+            </CardHeader>
+        </Card>
         <div className="flex flex-col justify-center items-center  sm:flex-row mb-4">
         <SearchForm 
             searchTerm={searchTerm}
