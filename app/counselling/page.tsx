@@ -20,7 +20,7 @@ export default async function Home({ searchParams }: { searchParams: { page: str
       <h1 className="text-2xl font-bold mb-4" >
         Candidate Data
       </h1>
-      <PaginatedTable initialData={data} initialTotalCount={count} />
+      <PaginatedTable initialData={data} initialTotalCount={count} year="2024" />
     </main>
   )
 }
