@@ -23,14 +23,6 @@ const components = [
     title: "Account",
     href: "/profile",
   },
-  // {
-  //   title: "Data Source",
-  //   href: "/data-source",
-  //   subItems: [
-  //     { title: "2023", href: "/data-source/2023" },
-  //     { title: "2024", href: "/data-source/2024" },
-  //   ],
-  // },
   {
     title: "Counselling",
     href: "/counselling",
@@ -39,10 +31,15 @@ const components = [
       { title: "2024", href: "/counselling/2024" },
     ],
   },
-  // {
-  //   title: "Cutoffs",
-  //   href: "/cutoffs",
-  // },
+  {
+    title: "Suggestions",
+    href: "/suggestions",
+  },
+  {
+    title: "Discord",
+    href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
+    external: true, // Add this property to indicate it's an external link
+  }
 ]
 
 export function Navigation() {
@@ -68,7 +65,10 @@ export function Navigation() {
               </>
             ) : (
               <Link href={item.href} legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink 
+                  className={navigationMenuTriggerStyle()}
+                  {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
                   {item.title}
                 </NavigationMenuLink>
               </Link>

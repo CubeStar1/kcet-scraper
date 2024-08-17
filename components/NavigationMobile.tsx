@@ -24,14 +24,6 @@ const menuItems = [
     title: "Account",
     href: "/profile",
   },
-  // {
-  //   title: "Data Source",
-  //   href: "/data-source",
-  //   subItems: [
-  //     { title: "2023", href: "/data-source/2023" },
-  //     { title: "2024", href: "/data-source/2024" },
-  //   ],
-  // },
   {
     title: "Counselling",
     href: "/counselling",
@@ -40,10 +32,15 @@ const menuItems = [
       { title: "2024", href: "/counselling/2024" },
     ],
   },
-  // {
-  //   title: "Cutoffs",
-  //   href: "/cutoffs",
-  // },
+  {
+    title: "Suggestions",
+    href: "/suggestions",
+  },
+  {
+    title: "Discord",
+    href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
+    external: true,
+  },
 ]
 
 export function NavigationMobile() {
@@ -64,10 +61,12 @@ export function NavigationMobile() {
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>{item.title}</DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
-                      <DropdownMenuSubContent >
+                      <DropdownMenuSubContent>
                         {item.subItems.map((subItem) => (
-                          <DropdownMenuItem key={subItem.title} >
-                            <Link href={subItem.href}>{subItem.title}</Link>
+                          <DropdownMenuItem key={subItem.title}>
+                            <Link href={subItem.href} className="w-full">
+                              {subItem.title}
+                            </Link>
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuSubContent>
@@ -75,7 +74,13 @@ export function NavigationMobile() {
                   </DropdownMenuSub>
                 ) : (
                   <DropdownMenuItem>
-                    <Link href={item.href}>{item.title}</Link>
+                    <Link 
+                      href={item.href} 
+                      className="w-full"
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    >
+                      {item.title}
+                    </Link>
                   </DropdownMenuItem>
                 )}
               </React.Fragment>

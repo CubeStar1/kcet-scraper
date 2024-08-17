@@ -13,15 +13,8 @@ import {
 import TableSkeleton from './TableSkeleton';
 import SearchForm from './SearchForm';
 import TablePagination from './TablePagination';
-import { Button } from './ui/button';
-import Link from 'next/link';
-import { InfoIcon } from 'lucide-react';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCookie, setCookie } from 'cookies-next';
-
-const RATE_LIMIT = 30;
-const RATE_LIMIT_WINDOW = 12 * 60 * 60; // 12 hours in seconds
-
+import { useToast } from "@/components/ui/use-toast";
+import  useUser  from '@/app/hook/useUser'; // Import useUser hook
 
 
 export type TableData = {
@@ -46,36 +39,61 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [activeSearchTerm, setActiveSearchTerm] = useState(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingSearches, setRemainingSearches] = useState(RATE_LIMIT);
+  const [remainingSearches, setRemainingSearches] = useState(60);
   const [error, setError] = useState('');
   const pageSize = 20;
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const updateRateLimit = useCallback(() => {
-    const currentCount = parseInt(getCookie('search_count') as string || '0', 10);
-    const lastReset = parseInt(getCookie('last_reset') as string || '0', 10);
-    const now = Math.floor(Date.now() / 1000);
+  const { toast } = useToast();
 
-    if (now - lastReset >= RATE_LIMIT_WINDOW) {
-      setCookie('search_count', '1', { maxAge: RATE_LIMIT_WINDOW });
-      setCookie('last_reset', now.toString(), { maxAge: RATE_LIMIT_WINDOW });
-      setRemainingSearches(RATE_LIMIT - 1);
-    } else if (currentCount >= RATE_LIMIT) {
-      setRemainingSearches(0);
-      throw new Error('Rate limit exceeded');
-    } else {
-      const newCount = currentCount + 1;
-      setCookie('search_count', newCount.toString(), { maxAge: RATE_LIMIT_WINDOW });
-      setRemainingSearches(RATE_LIMIT - newCount);
+  const { data: user } = useUser(); // Use the useUser hook
+
+  const checkSearchLimit = useCallback(async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to perform searches.",
+        variant: "destructive",
+      });
+      return false;
     }
-  }, []);
+
+    try {
+      const response = await fetch('/api/search-limit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id }), // Pass the user ID to the API
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setRemainingSearches(data.remainingSearches);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      return false;
+    }
+    return true;
+  }, [user, toast]);
 
   const fetchData = useCallback(async (page: number, search: string) => {
     setIsLoading(true);
     setError('');
     try {
-      updateRateLimit();
+      const canProceed = await checkSearchLimit();
+      if (!canProceed) return;
+
       const res = await fetch(`/api/data/${year}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -87,6 +105,11 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
       } else {
         setError('An error occurred');
       }
@@ -94,12 +117,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     } finally {
       setIsLoading(false);
     }
-  }, [year, updateRateLimit]);
-
-  useEffect(() => {
-    const currentCount = parseInt(getCookie('search_count') as string || '0', 10);
-    setRemainingSearches(RATE_LIMIT - currentCount);
-  }, []);
+  }, [year, pageSize, checkSearchLimit, toast]);
 
   useEffect(() => {
     fetchData(currentPage, activeSearchTerm);
@@ -116,14 +134,13 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event: React.FormEvent) => {
+  const handleSearchSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (remainingSearches > 0) {
+    const canProceed = await checkSearchLimit();
+    if (canProceed) {
       setActiveSearchTerm(searchTerm);
       fetchData(1, searchTerm);
       router.push(`?page=1&search=${encodeURIComponent(searchTerm)}`, { scroll: false });
-    } else {
-      setError('Search rate limit exceeded. Please try again later.');
     }
   };
 
@@ -151,9 +168,9 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
       {isLoading ? (
         <TableSkeleton />
       ) : (
-        <div className=" rounded-md">
+        <div className="rounded-md">
           <Table className="border-2 max-h-[500px] overflow-y-auto">
-            <TableHeader className="">
+            <TableHeader>
               <TableRow>
                 <TableHead>CET No</TableHead>
                 <TableHead>Name</TableHead>
@@ -166,7 +183,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
                 <TableHead>S. No. Allotted Option</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody >
+            <TableBody>
               {data.map((item: TableData) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.cet_no}</TableCell>
