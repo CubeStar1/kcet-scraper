@@ -21,13 +21,17 @@ const menuItems = [
     href: "/about",
   },
   {
-    title: "Data Source",
-    href: "/data-source",
-    subItems: [
-      { title: "2023", href: "/data-source/2023" },
-      { title: "2024", href: "/data-source/2024" },
-    ],
+    title: "Account",
+    href: "/profile",
   },
+  // {
+  //   title: "Data Source",
+  //   href: "/data-source",
+  //   subItems: [
+  //     { title: "2023", href: "/data-source/2023" },
+  //     { title: "2024", href: "/data-source/2024" },
+  //   ],
+  // },
   {
     title: "Counselling",
     href: "/counselling",
@@ -36,10 +40,10 @@ const menuItems = [
       { title: "2024", href: "/counselling/2024" },
     ],
   },
-  {
-    title: "Cutoffs",
-    href: "/cutoffs",
-  },
+  // {
+  //   title: "Cutoffs",
+  //   href: "/cutoffs",
+  // },
 ]
 
 export function NavigationMobile() {

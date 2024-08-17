@@ -5,6 +5,10 @@ import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css";
 import NextTopLoader from 'nextjs-toploader';
 import { Analytics } from "@vercel/analytics/react"
+import { Toaster } from "sonner";
+import QueryProvider from "@/components/query-provider";
+import QueryClientProvider from "@/components/query-provider";
+
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Header />
           <NextTopLoader
@@ -37,7 +42,11 @@ export default function RootLayout({
            />
           {children}
           <Analytics />
-          <Script id="clarity-script" strategy="afterInteractive">
+          
+        <Toaster />
+        </ThemeProvider>
+        </QueryProvider>
+        <Script id="clarity-script" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -46,7 +55,6 @@ export default function RootLayout({
             })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}");
           `}
         </Script>
-        </ThemeProvider>
       </body>
     </html>
   );

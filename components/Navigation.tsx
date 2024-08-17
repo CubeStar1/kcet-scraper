@@ -19,6 +19,10 @@ const components = [
     title: "About",
     href: "/about",
   },
+  {
+    title: "Account",
+    href: "/profile",
+  },
   // {
   //   title: "Data Source",
   //   href: "/data-source",
