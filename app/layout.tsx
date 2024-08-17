@@ -42,11 +42,8 @@ export default function RootLayout({
            />
           {children}
           <Analytics />
-          
-        <Toaster />
-        </ThemeProvider>
-        </QueryProvider>
-        <Script id="clarity-script" strategy="afterInteractive">
+          <Toaster />
+          <Script id="clarity-script" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -54,7 +51,10 @@ export default function RootLayout({
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
             })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID}");
           `}
-        </Script>
+        </Script> 
+        </ThemeProvider>
+        </QueryProvider>
+        
       </body>
     </html>
   );

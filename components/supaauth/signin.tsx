@@ -91,6 +91,7 @@ export function SignInForm({ redirectTo }: { redirectTo: string }) {
 					toast.error(error.message);
 				} else {
 					router.push(redirectTo);
+					router.refresh();
 				}
 			});
 		}
