@@ -2,7 +2,7 @@
 import PaginatedTable from '@/components/PaginatedTable'
 
 async function getInitialData(page: number, pageSize: number) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/2024?page=${page}&pageSize=${pageSize}`, { cache:  'no-store' })
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/data/2024?page=${page}&pageSize=${pageSize}`)
   if (!res.ok) {
     throw new Error('Failed to fetch data')
   }
