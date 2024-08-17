@@ -14,7 +14,9 @@ import TableSkeleton from './TableSkeleton';
 import SearchForm from './SearchForm';
 import TablePagination from './TablePagination';
 import { useToast } from "@/components/ui/use-toast";
-import  useUser  from '@/app/hook/useUser'; // Import useUser hook
+import  useUser  from '@/app/hook/useUser'; 
+import { formatDistanceToNow } from 'date-fns'; 
+
 
 
 export type TableData = {
@@ -41,6 +43,8 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
   const [isLoading, setIsLoading] = useState(false);
   const [remainingSearches, setRemainingSearches] = useState(60);
   const [error, setError] = useState('');
+  const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
+
   const pageSize = 20;
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -65,11 +69,12 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }), // Pass the user ID to the API
+        body: JSON.stringify({ userId: user.id }),
       });
       const data = await response.json();
       if (response.ok) {
         setRemainingSearches(data.remainingSearches);
+        setNextResetTime(new Date(data.nextResetTime));
       } else {
         throw new Error(data.error);
       }
@@ -163,6 +168,11 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
       </div>
       <div className="text-sm text-gray-500 mb-2">
         Remaining searches: {remainingSearches}
+        {nextResetTime && (
+          <span className="ml-2">
+            (Resets in {formatDistanceToNow(nextResetTime)})
+          </span>
+        )}
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
       {isLoading ? (
