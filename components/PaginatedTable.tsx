@@ -17,6 +17,12 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 import { InfoIcon } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { getCookie, setCookie } from 'cookies-next';
+
+const RATE_LIMIT = 30;
+const RATE_LIMIT_WINDOW = 12 * 60 * 60; // 12 hours in seconds
+
+
 
 export type TableData = {
   id: string;
@@ -40,13 +46,36 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [activeSearchTerm, setActiveSearchTerm] = useState(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [remainingSearches, setRemainingSearches] = useState(RATE_LIMIT);
+  const [error, setError] = useState('');
   const pageSize = 20;
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
+  const updateRateLimit = useCallback(() => {
+    const currentCount = parseInt(getCookie('search_count') as string || '0', 10);
+    const lastReset = parseInt(getCookie('last_reset') as string || '0', 10);
+    const now = Math.floor(Date.now() / 1000);
+
+    if (now - lastReset >= RATE_LIMIT_WINDOW) {
+      setCookie('search_count', '1', { maxAge: RATE_LIMIT_WINDOW });
+      setCookie('last_reset', now.toString(), { maxAge: RATE_LIMIT_WINDOW });
+      setRemainingSearches(RATE_LIMIT - 1);
+    } else if (currentCount >= RATE_LIMIT) {
+      setRemainingSearches(0);
+      throw new Error('Rate limit exceeded');
+    } else {
+      const newCount = currentCount + 1;
+      setCookie('search_count', newCount.toString(), { maxAge: RATE_LIMIT_WINDOW });
+      setRemainingSearches(RATE_LIMIT - newCount);
+    }
+  }, []);
+
   const fetchData = useCallback(async (page: number, search: string) => {
     setIsLoading(true);
+    setError('');
     try {
+      updateRateLimit();
       const res = await fetch(`/api/data/${year}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
@@ -56,11 +85,21 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
       setTotalCount(newData.count);
       setCurrentPage(page);
     } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An error occurred');
+      }
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [pageSize]);
+  }, [year, updateRateLimit]);
+
+  useEffect(() => {
+    const currentCount = parseInt(getCookie('search_count') as string || '0', 10);
+    setRemainingSearches(RATE_LIMIT - currentCount);
+  }, []);
 
   useEffect(() => {
     fetchData(currentPage, activeSearchTerm);
@@ -79,37 +118,36 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
 
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    setActiveSearchTerm(searchTerm);
-    fetchData(1, searchTerm);
-    router.push(`?page=1&search=${encodeURIComponent(searchTerm)}`, { scroll: false });
+    if (remainingSearches > 0) {
+      setActiveSearchTerm(searchTerm);
+      fetchData(1, searchTerm);
+      router.push(`?page=1&search=${encodeURIComponent(searchTerm)}`, { scroll: false });
+    } else {
+      setError('Search rate limit exceeded. Please try again later.');
+    }
   };
 
   return (
     <div>
-          <Card className="w-full flex-col">
-            <CardHeader>
-                <CardTitle className="flex flex-col gap-2 md:flex-row">
-                    <InfoIcon />
-                    <span className="text-sm md:text-base">All data has not been updated yet.</span>
-                    <span className="text-sm md:text-base"> Please check back later.</span>
-                </CardTitle>
-            </CardHeader>
-        </Card>
-        <div className="flex flex-col justify-center items-center  sm:flex-row mb-4">
+      <div className="flex flex-col justify-center items-center sm:flex-row mb-4">
         <SearchForm 
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
-            onSearchSubmit={handleSearchSubmit}
-            isLoading={isLoading}
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          isLoading={isLoading}
         />
         <div className="flex justify-end items-center sm:justify-start">
-        <TablePagination 
+          <TablePagination 
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-        />
+          />
         </div>
       </div>
+      <div className="text-sm text-gray-500 mb-2">
+        Remaining searches: {remainingSearches}
+      </div>
+      {error && <div className="text-red-500 mb-2">{error}</div>}
       {isLoading ? (
         <TableSkeleton />
       ) : (
@@ -146,7 +184,6 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
           </Table>
         </div>
       )}
-
     </div>
   );
 };

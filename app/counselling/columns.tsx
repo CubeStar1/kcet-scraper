@@ -1,5 +1,6 @@
 "use client"
 
+import { DataTableColumnHeader } from "@/components/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
@@ -21,25 +22,21 @@ export type TableData = {
 export const columns: ColumnDef<TableData>[] = [
   {
     accessorKey: "cet_no",
-    header: "CET No",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="CET No" />
+    ),
   },
   {
     accessorKey: "candidate_name",
-    header: "Candidate Name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
   },
   {
     accessorKey: "rank",
-    header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Rank
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Rank" />
+    ),
   },
   {
     accessorKey: "course_name",

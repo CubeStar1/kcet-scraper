@@ -1,11 +1,15 @@
 "use client"
 import * as React from "react"
+import { Button } from "@/components/ui/button"
+import SearchForm from "@/components/SearchForm"
+import TableSkeleton from "@/components/TableSkeleton"
 
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  getPaginationRowModel,
   SortingState,
   getSortedRowModel,
   ColumnFiltersState,
@@ -52,21 +56,14 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
     },
+    getPaginationRowModel: getPaginationRowModel(),
   })
+
+  
 
   return (
     <>
-    <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter Candidate Name..."
-          value={(table.getColumn("candidate_name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("candidate_name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-    </div>
-    <div className="rounded-md border">
+    <div className="rounded-lg border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -110,6 +107,7 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
     </div>
+      
     </>
   )
 }

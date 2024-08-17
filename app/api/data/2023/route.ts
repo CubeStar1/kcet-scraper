@@ -26,15 +26,15 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       if (isNaN(convertToNumber(search))) {
-        query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%`);
+        query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
       } else {
         query = query.or(`rank.eq.${convertToNumber(search)}`);
       }
     }
 
     const { data, count, error } = await query
-      .range(start, end)
-      .order('rank', { ascending: true });
+      .order('rank', { ascending: true })
+      .range(start, end);
 
     if (error) {
       throw error;
