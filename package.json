@@ -31,7 +31,7 @@
     "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "date-fns": "^3.6.0",
-    "framer-motion": "^11.3.25",
+    "framer-motion": "^11.3.28",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.427.0",
     "mini-svg-data-uri": "^1.4.4",

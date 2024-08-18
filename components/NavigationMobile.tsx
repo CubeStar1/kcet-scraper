@@ -41,6 +41,10 @@ const menuItems = [
     href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
     external: true,
   },
+  {
+    title: "Rate Limits",
+    href: "/rate-limits",
+  }
 ]
 
 export function NavigationMobile() {

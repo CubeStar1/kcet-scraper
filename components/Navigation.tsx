@@ -39,7 +39,13 @@ const components = [
     title: "Discord",
     href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
     external: true, // Add this property to indicate it's an external link
+  },
+  {
+    title: "Rate Limits",
+    href: "/rate-limits",
   }
+
+
 ]
 
 export function Navigation() {

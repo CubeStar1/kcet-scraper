@@ -3,9 +3,9 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { addHours } from 'date-fns';
 
-const MAX_SEARCHES = 60;
-const RESET_INTERVAL = 4; // 4 hours
-const SUGGESTION_REWARD = 30;
+const MAX_SEARCHES = 10;
+const RESET_INTERVAL = 24; // 4 hours
+const SUGGESTION_REWARD = 2;
 
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies });

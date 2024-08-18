@@ -6,10 +6,14 @@ import { Input } from "@/components/ui/input"
 import SearchInput from "@/components/SearchInput"
 import { HeroScrollDemo } from "@/components/HeroScroll"
 import { Spotlight } from '@/components/ui/spotlight'
+import RateLimitBanner from '@/components/RateLimitBanner'
 
 const Page = () => {
   return (
     <div>
+      <div className="flex justify-center items-center mx-2">
+        <RateLimitBanner />
+      </div>
       <div className="relative max-h-[calc(100vh-12rem)] ">
         <div className="absolute inset-0 backdrop-blur-sm" />
         <div className="relative container mx-auto px-8 py-16 flex flex-col items-center justify-center text-center z-10 gap-14">
