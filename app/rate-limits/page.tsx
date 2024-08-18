@@ -7,7 +7,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { AlertCircle, Clock, Zap, Server } from "lucide-react";
-import Image from 'next/image'
 
 const TimelineEvent = ({ title, description, icon }: { title: string; description: string; icon: React.ReactNode }) => (
   <motion.div
@@ -43,7 +42,7 @@ const RateLimitExplanationPage = () => {
           />
           <TimelineEvent
             title="Resource Depletion"
-            description="The attack consumed a large portion of our edge function limit on Vercel's free tier."
+            description="The attack consumed a large portion of our edge function limit on Vercel&apos;s free tier."
             icon={<AlertCircle className="w-6 h-6" />}
           />
           <TimelineEvent
@@ -53,12 +52,6 @@ const RateLimitExplanationPage = () => {
           />
         </CardContent>
       </Card>
-    
-        <Card>
-        <CardContent className="flex justify-center items-center">
-            <Image src="/rate-limit.png" alt="Rate Limit Explanation" width={1000} height={1000} />
-        </CardContent>
-        </Card>
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -71,10 +64,10 @@ const RateLimitExplanationPage = () => {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              We've had to implement stricter temporary limits to ensure service stability:
+              We&apos;ve had to implement stricter temporary limits to ensure service stability:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
-              <li><strong>Maximum Searches:</strong> 10 per reset interval (previously 60)</li>
+              <li><strong>Maximum Searches:</strong> 20 per reset interval (previously 60)</li>
               <li><strong>Reset Interval:</strong> 24 hours (previously 4 hours)</li>
               <li><strong>Suggestion Reward:</strong> 2 additional searches (previously 30)</li>
             </ul>
@@ -89,6 +82,33 @@ const RateLimitExplanationPage = () => {
         </Card>
       </motion.div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Why We Can&apos;t Immediately Upgrade</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">
+              While upgrading to a paid plan would allow us to relax these limits, there are financial constraints to consider:
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li>The Vercel Pro tier, which would provide more resources, costs $20 per month to host our application.</li>
+              <li>As a free service, we currently don&apos;t have a revenue stream to support this additional cost.</li>
+            </ul>
+            <Alert variant="default" className=" border-blue-500">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Important</AlertTitle>
+              <AlertDescription>
+                Until our current plan resets next month, we must maintain these stricter limits to ensure the service remains available.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -101,7 +121,7 @@ const RateLimitExplanationPage = () => {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              Our application is hosted on Vercel, a cloud platform for static and serverless deployment. We're currently using their free tier, which comes with certain limitations:
+              Our application is hosted on Vercel, a cloud platform for static and serverless deployment. We&apos;re currently using their free tier, which comes with certain limitations:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Limited serverless function executions</li>
@@ -125,36 +145,6 @@ const RateLimitExplanationPage = () => {
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Why We Can't Immediately Upgrade</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4">
-              While upgrading to a paid plan would allow us to relax these limits, there are financial constraints to consider:
-            </p>
-            <ul className="list-disc pl-6 mb-4 space-y-2">
-              <li>The Vercel Pro tier, which would provide more resources, costs $20 per month to host our application.</li>
-              <li>As a free service, we currently don't have a revenue stream to support this additional cost.</li>
-            </ul>
-            <Alert variant="default" className=" border-blue-500">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Important</AlertTitle>
-              <AlertDescription>
-                Until we can secure additional funding or our current plan resets next month, we must maintain these stricter limits to ensure the service remains available.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      
-
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
       >
         <Card>
@@ -163,15 +153,15 @@ const RateLimitExplanationPage = () => {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              We're actively working on solutions to improve our service capacity:
+              We&apos;re actively working on solutions to improve our service capacity:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Optimizing our code to reduce resource usage</li>
-              <li>Using caching strategies to reduce the load on our database</li>
-              <li>Investigating more sustainable hosting solutions such sas Cloudflare</li>
+              <li>Exploring caching strategies to reduce the load on our database</li>
+              <li>Investigating more sustainable hosting solutions such as Cloudflare</li>
             </ul>
             <p className="mb-4">
-              Our goal is to relax these strict limits as soon as it's feasible to do so without compromising the stability of our service. We'll keep you updated on any changes to these limits.
+              Our goal is to relax these strict limits as soon as it&apos;s feasible to do so without compromising the stability of our service. We&apos;ll keep you updated on any changes to these limits.
             </p>
             <p className="mb-4">
               We greatly appreciate your patience and continued support as we work through these challenges. Your understanding helps us continue to provide this service to our community.
