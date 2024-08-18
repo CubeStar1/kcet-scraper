@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import useUser  from '@/app/hook/useUser';
+import useUser from '@/app/hook/useUser';
 import { createSupabaseBrowser } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,24 +55,41 @@ export default function SuggestionsPage() {
       return;
     }
 
-    const { data, error } = await supabase
-      .from('suggestions')
-      .insert({ content: newSuggestion, user_id: user.id })
-      .select();
+    try {
+      // Insert the suggestion
+      const { error: suggestionError } = await supabase
+        .from('suggestions')
+        .insert({ content: newSuggestion, user_id: user.id });
 
-    if (error) {
+      if (suggestionError) throw suggestionError;
+
+      // Increase the user's search limit
+      const response = await fetch('/api/search-limit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id, action: 'suggestion_reward' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update search limit');
+      }
+
+      const data = await response.json();
+
+      setNewSuggestion('');
+      fetchSuggestions();
+      toast({
+        title: "Success",
+        description: `Your suggestion has been submitted. Your remaining searches: ${data.remainingSearches}`,
+      });
+    } catch (error) {
       console.error('Error submitting suggestion:', error);
       toast({
         title: "Error",
         description: "Failed to submit suggestion. Please try again.",
         variant: "destructive",
-      });
-    } else {
-      setNewSuggestion('');
-      fetchSuggestions();
-      toast({
-        title: "Success",
-        description: "Your suggestion has been submitted.",
       });
     }
   }

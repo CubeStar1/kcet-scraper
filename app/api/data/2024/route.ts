@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-// invalid input syntax for type integer: "%1325%"'
-
 function convertToNumber(search: string) {
   return parseInt(search, 10);
 }
@@ -13,6 +11,8 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '20', 10);
   const search = searchParams.get('search') || '';
+  const courseCode = searchParams.get('courseCode') || '';
+  const categoryAllotted = searchParams.get('categoryAllotted') || '';
 
   const supabase = createRouteHandlerClient({ cookies });
 
@@ -29,6 +29,22 @@ export async function GET(request: NextRequest) {
         query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
       } else {
         query = query.or(`rank.gte.${convertToNumber(search)}`);
+      }
+    }
+
+    if (courseCode) {
+      if (courseCode === 'All Courses') {
+        query = query.eq('course_code', '');
+      } else {
+        query = query.eq('course_code', courseCode);
+      }
+    }
+
+    if (categoryAllotted) {
+      if (categoryAllotted === 'All Categories') {
+        query = query.eq('category_allotted', '');
+      } else {
+        query = query.eq('category_allotted', categoryAllotted);
       }
     }
 

@@ -1,7 +1,8 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { 
   Table,
   TableBody,
@@ -12,12 +13,9 @@ import {
 } from "@/components/ui/table"
 import TableSkeleton from './TableSkeleton';
 import SearchForm from './SearchForm';
-import TablePagination from './TablePagination';
 import { useToast } from "@/components/ui/use-toast";
-import  useUser  from '@/app/hook/useUser'; 
+import useUser from '@/app/hook/useUser'; 
 import { formatDistanceToNow } from 'date-fns'; 
-
-
 
 export type TableData = {
   id: string;
@@ -35,7 +33,7 @@ export type TableData = {
 const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData: TableData[], initialTotalCount: number, year: string })  => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
+  const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState(initialData);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
@@ -44,14 +42,25 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
   const [remainingSearches, setRemainingSearches] = useState(60);
   const [error, setError] = useState('');
   const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
+  const [hasMore, setHasMore] = useState(true);
 
   const pageSize = 20;
-
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const { toast } = useToast();
+  const { data: user } = useUser();
 
-  const { data: user } = useUser(); // Use the useUser hook
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback((node: HTMLTableRowElement | null) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setCurrentPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
 
   const checkSearchLimit = useCallback(async () => {
     if (!user) {
@@ -92,60 +101,99 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     return true;
   }, [user, toast]);
 
-  const fetchData = useCallback(async (page: number, search: string) => {
+  const fetchData = useCallback(async (page: number, search: string, courseCode: string, category: string, append: boolean = false) => {
     setIsLoading(true);
     setError('');
     try {
       const canProceed = await checkSearchLimit();
       if (!canProceed) return;
-
-      const res = await fetch(`/api/data/${year}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}`);
+  
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+        search: search,
+        courseCode: courseCode,
+        category: category
+      });
+  
+      const res = await fetch(`/api/data/${year}?${queryParams}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }
       const newData = await res.json();
-      setData(newData.data);
-      setTotalCount(newData.count);
-      setCurrentPage(page);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+      
+      if (append) {
+        setData(prevData => [...prevData, ...newData.data]);
       } else {
-        setError('An error occurred');
+        setData(newData.data);
       }
+      
+      setTotalCount(newData.count);
+      setHasMore(newData.data.length === pageSize);
+  
+      // Update remaining searches after successful data fetch
+      const searchLimitResponse = await fetch('/api/search-limit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user?.id }),
+      });
+      if (searchLimitResponse.ok) {
+        const searchLimitData = await searchLimitResponse.json();
+        setRemainingSearches(searchLimitData.remainingSearches);
+        setNextResetTime(new Date(searchLimitData.nextResetTime));
+
+        // Show toast when remaining searches are low
+        if (searchLimitData.remainingSearches <= 10) {
+          toast({
+            title: "Low on searches",
+            description: (
+              <div>
+                You have {searchLimitData.remainingSearches} searches left. 
+                <Link href="/suggestions" className="ml-1 text-blue-500 hover:underline">
+                  Submit a suggestion
+                </Link> to get 30 more!
+              </div>
+            ),
+            duration: 10000, // Show for 10 seconds
+          });
+        }
+      }
+    } catch (error) {
       console.error('Error fetching data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load data",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [year, pageSize, checkSearchLimit, toast]);
+  }, [year, pageSize, checkSearchLimit, toast, user]);
+  
 
   useEffect(() => {
-    fetchData(currentPage, activeSearchTerm);
-  }, [currentPage, activeSearchTerm, fetchData]);
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      fetchData(newPage, activeSearchTerm);
-      router.push(`?page=${newPage}&search=${encodeURIComponent(activeSearchTerm)}`, { scroll: false });
-    }
-  };
+    fetchData(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
+  }, [currentPage, activeSearchTerm, fetchData, searchParams]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = async (event: React.FormEvent) => {
+  const handleSearchSubmit = async (event: React.FormEvent, courseCode: string, category: string) => {
     event.preventDefault();
     const canProceed = await checkSearchLimit();
     if (canProceed) {
       setActiveSearchTerm(searchTerm);
-      fetchData(1, searchTerm);
-      router.push(`?page=1&search=${encodeURIComponent(searchTerm)}`, { scroll: false });
+      setCurrentPage(1);
+      fetchData(1, searchTerm, courseCode, category);
+      const queryParams = new URLSearchParams({
+        search: searchTerm,
+        courseCode: courseCode,
+        category: category
+      });
+      router.push(`?${queryParams.toString()}`, { scroll: false });
     }
   };
 
@@ -158,13 +206,6 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
           onSearchSubmit={handleSearchSubmit}
           isLoading={isLoading}
         />
-        <div className="flex justify-end items-center sm:justify-start">
-          <TablePagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
       </div>
       <div className="text-sm text-gray-500 mb-2">
         Remaining searches: {remainingSearches}
@@ -173,44 +214,44 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
             (Resets in {formatDistanceToNow(nextResetTime)})
           </span>
         )}
+        <Link href="/suggestions" className="ml-2 text-blue-500 hover:underline">
+          Submit a suggestion to get more searches!
+        </Link>
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      {isLoading ? (
-        <TableSkeleton />
-      ) : (
-        <div className="rounded-md">
-          <Table className="border-2 max-h-[500px] overflow-y-auto">
-            <TableHeader>
-              <TableRow>
-                <TableHead>CET No</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Rank</TableHead>
-                <TableHead>Course</TableHead>
-                <TableHead>Course Code</TableHead>
-                <TableHead>Verified Category</TableHead>
-                <TableHead>Category Allotted</TableHead>
-                <TableHead>Course Fee</TableHead>
-                <TableHead>S. No. Allotted Option</TableHead>
+      <div className="rounded-md">
+        <Table className="border-2 max-h-[500px] overflow-y-auto">
+          <TableHeader>
+            <TableRow>
+              <TableHead>CET No</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Rank</TableHead>
+              <TableHead>Course</TableHead>
+              <TableHead>Course Code</TableHead>
+              <TableHead>Verified Category</TableHead>
+              <TableHead>Category Allotted</TableHead>
+              <TableHead>Course Fee</TableHead>
+              <TableHead>S. No. Allotted Option</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item: TableData, index: number) => (
+              <TableRow key={item.id} ref={index === data.length - 1 ? lastElementRef : null}>
+                <TableCell>{item.cet_no}</TableCell>
+                <TableCell>{item.candidate_name}</TableCell>
+                <TableCell>{item.rank}</TableCell>
+                <TableCell>{item.course_name}</TableCell>
+                <TableCell>{item.course_code}</TableCell>
+                <TableCell>{item.verified_category}</TableCell>
+                <TableCell>{item.category_allotted}</TableCell>
+                <TableCell>{item.course_fee}</TableCell>
+                <TableCell>{item.serial_number_allotted_option}</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item: TableData) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.cet_no}</TableCell>
-                  <TableCell>{item.candidate_name}</TableCell>
-                  <TableCell>{item.rank}</TableCell>
-                  <TableCell>{item.course_name}</TableCell>
-                  <TableCell>{item.course_code}</TableCell>
-                  <TableCell>{item.verified_category}</TableCell>
-                  <TableCell>{item.category_allotted}</TableCell>
-                  <TableCell>{item.course_fee}</TableCell>
-                  <TableCell>{item.serial_number_allotted_option}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      {isLoading && <TableSkeleton />}
     </div>
   );
 };

@@ -1,23 +1,21 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { addHours } from 'date-fns'; // Make sure to install date-fns: npm install date-fns
+import { addHours } from 'date-fns';
 
 const MAX_SEARCHES = 60;
 const RESET_INTERVAL = 4; // 4 hours
+const SUGGESTION_REWARD = 30;
 
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies });
 
-  // Get the user ID from the request body
-  const { userId } = await request.json();
+  // Get the user ID and action from the request body
+  const { userId, action } = await request.json();
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  // Start a transaction
-  const { data: client } = await supabase.rpc('begin_transaction');
 
   try {
     // Get or create the user's search record
@@ -31,7 +29,7 @@ export async function POST(request: Request) {
       // Record doesn't exist, create a new one
       const { data: newRecord, error: insertError } = await supabase
         .from('user_searches')
-        .insert({ user_id: userId })
+        .insert({ user_id: userId, search_count: 0, last_reset: new Date().toISOString() })
         .select()
         .single();
 
@@ -50,42 +48,48 @@ export async function POST(request: Request) {
       const nextResetTime = addHours(now, RESET_INTERVAL);
       const { error: resetError } = await supabase
         .from('user_searches')
-        .update({ search_count: 1, last_reset: now.toISOString() })
+        .update({ search_count: 0, last_reset: now.toISOString() })
         .eq('user_id', userId);
 
       if (resetError) throw resetError;
-
-      await supabase.rpc('commit_transaction');
-      return NextResponse.json({ 
-        remainingSearches: MAX_SEARCHES - 1,
-        nextResetTime: nextResetTime.toISOString()
-      });
-    } else if (searchRecord.search_count >= MAX_SEARCHES) {
-      // Rate limit exceeded
-      const nextResetTime = addHours(lastReset, RESET_INTERVAL);
-      await supabase.rpc('rollback_transaction');
-      return NextResponse.json({ 
-        error: 'Rate limit exceeded',
-        nextResetTime: nextResetTime.toISOString()
-      }, { status: 429 });
-    } else {
-      // Increment the search count
-      const { error: updateError } = await supabase
-        .from('user_searches')
-        .update({ search_count: searchRecord.search_count + 1 })
-        .eq('user_id', userId);
-
-      if (updateError) throw updateError;
-
-      const nextResetTime = addHours(lastReset, RESET_INTERVAL);
-      await supabase.rpc('commit_transaction');
-      return NextResponse.json({ 
-        remainingSearches: MAX_SEARCHES - (searchRecord.search_count + 1),
-        nextResetTime: nextResetTime.toISOString()
-      });
+      searchRecord.search_count = 0;
     }
+
+    let newSearchCount = searchRecord.search_count;
+    let remainingSearches = MAX_SEARCHES - newSearchCount;
+
+    if (action === 'suggestion_reward') {
+      // Reward the user for submitting a suggestion
+      newSearchCount = Math.max(newSearchCount - SUGGESTION_REWARD, 0);
+      remainingSearches = MAX_SEARCHES - newSearchCount;
+    } else {
+      // Check if the user has exceeded the search limit
+      if (remainingSearches <= 0) {
+        return NextResponse.json({ 
+          error: 'Rate limit exceeded',
+          nextResetTime: addHours(lastReset, RESET_INTERVAL).toISOString()
+        }, { status: 429 });
+      }
+
+      // Increment the search count by 1
+      newSearchCount += 1;
+      remainingSearches = MAX_SEARCHES - newSearchCount;
+    }
+
+    // Update the search count in the database
+    const { error: updateError } = await supabase
+      .from('user_searches')
+      .update({ search_count: newSearchCount })
+      .eq('user_id', userId);
+
+    if (updateError) throw updateError;
+
+    return NextResponse.json({ 
+      remainingSearches,
+      nextResetTime: addHours(lastReset, RESET_INTERVAL).toISOString()
+    });
+
   } catch (error) {
-    await supabase.rpc('rollback_transaction');
     console.error('Error in search limit check:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
