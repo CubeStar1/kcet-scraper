@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { Toaster } from "sonner";
 import QueryProvider from "@/components/query-provider";
 import QueryClientProvider from "@/components/query-provider";
+import DowntimeBanner from "@/components/DownTimeBanner";
 
 import Script from "next/script";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
         <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Header />
+          <DowntimeBanner />
           <NextTopLoader
            color="#2299DD"
            initialPosition={0.08}

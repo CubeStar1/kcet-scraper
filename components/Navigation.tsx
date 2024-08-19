@@ -16,34 +16,46 @@ import {
 
 const components = [
   {
-    title: "About",
-    href: "/about",
-  },
-  {
-    title: "Account",
-    href: "/profile",
-  },
-  {
-    title: "Counselling",
-    href: "/counselling",
+    title: "Downtime",
+    href: "/downtime",
     subItems: [
-      { title: "2023", href: "/counselling/2023" },
-      { title: "2024", href: "/counselling/2024" },
+      { title: "2024", href: "/downtime" },
     ],
   },
-  {
-    title: "Suggestions",
-    href: "/suggestions",
-  },
+  // {
+  //   title: "About",
+  //   href: "/about",
+  // },
+  // {
+  //   title: "Account",
+  //   href: "/profile",
+  // },
+  // {
+  //   title: "Counselling",
+  //   href: "/counselling",
+  //   subItems: [
+  //     { title: "2023", href: "/counselling/2023" },
+  //     { title: "2024", href: "/counselling/2024" },
+  //   ],
+  // },
+  // {
+  //   title: "Suggestions",
+  //   href: "/suggestions",
+  // },
   {
     title: "Discord",
     href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
     external: true, // Add this property to indicate it's an external link
   },
-  {
-    title: "Rate Limits",
-    href: "/rate-limits",
-  }
+  // {
+  //   title: "Rate Limits",
+  //   href: "/rate-limits",
+  // },
+  // {
+  //   title: "Cutoffs",
+  //   href: "/cutoffs",
+  // },
+  
 
 
 ]

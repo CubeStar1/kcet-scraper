@@ -27,9 +27,9 @@ const Page = () => {
           <p className="text-xl font-bold md:text-2xl mb-8 max-w-2xl ">
             View ranks and college allotments from the latest KCET counselling results
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md ">
+          {/* <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md ">
             <SearchInput />
-          </div>
+          </div> */}
           <p className="text-sm md:text-sm mb-8 max-w-2xl text-gray-400">
             Last Scraped: 2024-08-15 at 12:00 PM
           </p>
