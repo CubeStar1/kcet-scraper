@@ -41,7 +41,7 @@ const DowntimePage = () => {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              While KCET-Scraper is temporarily unavailable, we're providing alternative ways to access data and stay updated:
+              While KCET-Scraper is temporarily unavailable, we&apos;re providing alternative ways to access data and stay updated:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Join our Discord server for access to essential data and real-time updates.</li>
@@ -69,7 +69,7 @@ const DowntimePage = () => {
         <CardContent>
           <TimelineEvent
             title="Resource Depletion"
-            description="We've exhausted our allocated resources on Vercel's free hosting tier."
+            description="We&apos;ve exhausted our allocated resources on Vercel&apos;s free hosting tier."
             icon={<AlertCircle className="w-6 h-6" />}
           />
           <TimelineEvent
@@ -92,11 +92,11 @@ const DowntimePage = () => {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Why We're Experiencing Downtime</CardTitle>
+            <CardTitle>Why We&apos;re Experiencing Downtime</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              KCET-Scraper is hosted on Vercel's free tier, which comes with certain resource limitations:
+              KCET-Scraper is hosted on Vercel&apos;s free tier, which comes with certain resource limitations:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Limited serverless function executions</li>
@@ -104,7 +104,7 @@ const DowntimePage = () => {
               <li>Caps on build minutes and other resources</li>
             </ul>
             <p className="mb-4">
-              Due to high usage, we've reached these limits earlier than anticipated. To ensure the service's availability during the critical KCET counselling period, we've decided to pause operations until our resources reset.
+              Due to high usage, we&apos;ve reached these limits earlier than anticipated. To ensure the service&apos;s availability during the critical KCET counselling period, we&apos;ve decided to pause operations until our resources reset.
             </p>
             <Alert variant="default" className="border-blue-500">
               <AlertCircle className="h-4 w-4" />
@@ -128,7 +128,7 @@ const DowntimePage = () => {
           </CardHeader>
           <CardContent>
             <p className="mb-4">
-              Here's what you can expect during and after this downtime:
+              Here&apos;s what you can expect during and after this downtime:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>KCET-Scraper will be unavailable for approximately 10 days.</li>
@@ -161,8 +161,8 @@ const DowntimePage = () => {
               We understand the importance of KCET-Scraper, especially during the counselling period. We want to assure you that:
             </p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
-              <li>We're actively working on optimizing our resource usage to prevent future downtimes.</li>
-              <li>We're exploring options to upgrade our hosting plan for improved reliability.</li>
+              <li>We&apos;re actively working on optimizing our resource usage to prevent future downtimes.</li>
+              <li>We&apos;re exploring options to upgrade our hosting plan for improved reliability.</li>
               <li>Our team is committed to providing the best possible service during the critical KCET counselling rounds.</li>
             </ul>
             {/* <p className="mb-4">
