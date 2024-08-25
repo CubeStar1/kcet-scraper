@@ -208,11 +208,11 @@ export default function ChatPage() {
     }
   };
 
-  const handleDeleteMessage = async (messageId: string) => {
-    useEffect(() => {
-      deleteMessage(messageId);
-    }, [messageId, messages]);
-  };
+  // const handleDeleteMessage = async (messageId: string) => {
+  //   useEffect(() => {
+  //     deleteMessage(messageId);
+  //   }, [messageId, messages]);
+  // };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);

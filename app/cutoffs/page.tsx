@@ -168,7 +168,7 @@ export default function Component() {
               <SelectContent>
                 <SelectItem value="All">All Colleges</SelectItem>
                 {colleges.map(college => (
-                  <SelectItem value={college}>{college}</SelectItem>
+                  <SelectItem value={college} key={college}>{college}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -181,7 +181,7 @@ export default function Component() {
                 <SelectItem value="All">All Courses</SelectItem>
                 {collegeCodes.map( (code) =>
                 (
-                  <SelectItem value={code}>{code}</SelectItem>
+                  <SelectItem value={code} key={code}>{code}</SelectItem>
                 )
                 )
               }
