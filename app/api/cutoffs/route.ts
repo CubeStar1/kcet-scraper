@@ -10,15 +10,22 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search') || '';
   const college = searchParams.get('college');
   const course = searchParams.get('course');
-  const district = searchParams.get('district');
-  const category = searchParams.get('category');
+  const categories = searchParams.get('categories')?.split(',') || [];
   const kcetRank = searchParams.get('kcetRank');
-  const round = searchParams.get('round');
-  const showNewCourses = searchParams.get('showNewCourses') === 'true';
+  const round = searchParams.get('round') || 'Mock1';
+  const year = searchParams.get('year') || '2024';
+
+  const rounds = {
+    'Mock 1': 'm1',
+    'Round 1': 'r1',
+    'Round 2': 'r2',
+    'Round 3': 'r3'
+  } as { [key: string]: string };
 
   let query = supabase
-    .from('kcet_2022_r3_cutoffs')
-    .select('*');
+    .from(`kcet_${year}_${rounds[round]}_cutoffs`)
+    .select('*')
+    .order(`${categories[0]}`, { ascending: true });
 
   // Apply filters
   if (search) {
@@ -28,12 +35,12 @@ export async function GET(request: NextRequest) {
     query = query.eq('college_code', college);
   }
   if (course && course !== 'All') {
-    query = query.eq('branch', course);
+    query = query.or(`course_code.ilike.%${course}%`);
   }
-  if (kcetRank && category) {
-    query = query.lte(category, parseInt(kcetRank));
+  if (kcetRank && categories.length > 0) {
+    const rankFilters = categories.map(category => `${category}.gte.${parseInt(kcetRank)}`);
+    query = query.or(rankFilters.join(','));
   }
-  // Add more filters as needed
 
   const { data, error } = await query;
 

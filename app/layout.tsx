@@ -30,7 +30,7 @@ export default function RootLayout({
         <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Header />
-          <DowntimeBanner />
+          {/* <DowntimeBanner /> */}
           <NextTopLoader
            color="#2299DD"
            initialPosition={0.08}

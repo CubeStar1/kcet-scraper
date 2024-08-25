@@ -56,7 +56,7 @@ export default function SearchInput() {
         </SelectContent>
       </Select>
 
-      <Button variant="outline" onClick={handleSearch} className="rounded-full h-15"> <SearchIcon /> </Button>
+      {/* <Button variant="outline" onClick={handleSearch} className="rounded-full h-15"> <SearchIcon /> </Button> */}
       {/* </HoverBorderGradient> */}
     </div>
   );
