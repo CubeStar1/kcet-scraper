@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
       .from('kcet_2024_m1_table')
       .select('*', { count: 'exact' });
 
-    // Apply filters
     if (search) {
       if (isNaN(convertToNumber(search))) {
         query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
@@ -33,18 +32,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (courseCode && courseCode !== 'All Courses') {
-      query = query.eq('course_code', courseCode);
+    if (courseCode) {
+      if (courseCode === 'All Courses') {
+        query = query.eq('course_code', '');
+      } else {
+        query = query.eq('course_code', courseCode);
+      }
     }
 
-    if (categoryAllotted && categoryAllotted !== 'All Categories') {
-      query = query.eq('category_allotted', categoryAllotted);
+    if (categoryAllotted) {
+      if (categoryAllotted === 'All Categories') {
+        query = query.eq('category_allotted', '');
+      } else {
+        query = query.eq('category_allotted', categoryAllotted);
+      }
     }
 
     const { data, count, error } = await query
       .range(start, end)
       .order('rank', { ascending: true });
-
 
     if (error) {
       throw error;
