@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { collegeCodes, colleges, CutoffData, categoryOptions } from '@/lib/colleges';
 import { ArrowUpDown } from 'lucide-react';
 
-const rounds = ['Mock 1','Round 1', 'Round 2', 'Round 3']
+const rounds = ['Mock 1','Mock 2', 'Round 1', 'Round 2', 'Round 3']
 
 async function getCutoffData(filters: any) {
   const params = new URLSearchParams(filters);
@@ -122,6 +122,14 @@ export default function Component() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-6 max-w-7xl">
       <h1 className="text-2xl font-bold mb-6">College Cutoff Search</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Note</CardTitle>
+        </CardHeader>
+        <CardContent>
+          Cutoffs have only been provided for 2024 Mock Round 1, more will be added soon.
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -138,7 +146,7 @@ export default function Component() {
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
                 <SelectContent>
-                  {['2024', '2023', '2022', '2021', '2020', '2019'].map(year => (
+                  {['2024', '2023'].map(year => (
                     <SelectItem key={year} value={year}>{year}</SelectItem>
                   ))}
                 </SelectContent>

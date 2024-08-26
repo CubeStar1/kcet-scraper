@@ -24,8 +24,8 @@ const components = [
     subItems: [
       { title: "2023", href: "/counselling/2023" },
       { title: "2024", href: "/counselling/2024" },
-      // { title: "Cutoffs", href: "/cutoffs" },
-      // { title: "Option Entry", href: "/option-entry" },
+      { title: "Cutoffs", href: "/cutoffs" },
+      { title: "Option Entry", href: "/option-entry" },
     ],
   },
   {
@@ -48,7 +48,7 @@ const components = [
     title: "Account",
     subItems: [
       { title: "Profile", href: "/profile" },
-      // { title: "Dashboard", href: "/student-profile" },
+      { title: "Dashboard", href: "/student-profile" },
     ],
   },
   {
