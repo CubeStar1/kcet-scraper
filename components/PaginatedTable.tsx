@@ -135,9 +135,9 @@ const PaginatedTable = ({ year }: { year: string })  => {
     fetchDataAndCheckLimit(1, '', '', '', false);
   }, [fetchDataAndCheckLimit]);
 
-  // useEffect(() => {
-  //   fetchDataAndCheckLimit(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
-  // }, [currentPage, activeSearchTerm, searchParams, fetchDataAndCheckLimit]);
+  useEffect(() => {
+    fetchDataAndCheckLimit(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
+  }, [currentPage, activeSearchTerm, fetchDataAndCheckLimit]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
