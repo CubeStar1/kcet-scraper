@@ -37,7 +37,7 @@ const Page = () => {
             <Link href="/student-profile" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Dashboard
             </Link> */}
-            <Link href="/counselling" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
+            <Link href="/counselling/2024" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Counselling
             </Link>
             {/* <Link href="/chat" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
