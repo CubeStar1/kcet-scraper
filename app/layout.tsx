@@ -31,7 +31,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Header />
           {/* <DowntimeBanner /> */}
-          {/* <NextTopLoader
+          <NextTopLoader
            color="#2299DD"
            initialPosition={0.08}
            crawlSpeed={200}
@@ -41,7 +41,7 @@ export default function RootLayout({
            easing="ease"
            speed={200}
            shadow="0 0 10px #2299DD,0 0 5px #2299DD"
-           /> */}
+           />
           {children}
           <Analytics />
           <Toaster />

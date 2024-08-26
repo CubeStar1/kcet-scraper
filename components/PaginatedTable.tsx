@@ -62,103 +62,62 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
 
-  const checkSearchLimit = useCallback(async () => {
+  const fetchDataAndCheckLimit = useCallback(async (page: number, search: string, courseCode: string, category: string, append: boolean = false) => {
     if (!user) {
       toast({
         title: "Error",
         description: "You must be logged in to perform searches.",
         variant: "destructive",
       });
-      return false;
+      return;
     }
 
-    try {
-      const response = await fetch('/api/search-limit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.id }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setRemainingSearches(data.remainingSearches);
-        setNextResetTime(new Date(data.nextResetTime));
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-      return false;
-    }
-    return true;
-  }, [user, toast]);
-
-  const fetchData = useCallback(async (page: number, search: string, courseCode: string, category: string, append: boolean = false) => {
     setIsLoading(true);
     setError('');
+
     try {
-      const canProceed = await checkSearchLimit();
-      if (!canProceed) return;
-  
+      // Check search limit and fetch data in a single API call
       const queryParams = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
         search: search,
         courseCode: courseCode,
-        category: category
+        category: category,
+        userId: user.id
       });
-  
+      console.log(`queryParams: ${queryParams}`)
+
       const res = await fetch(`/api/data/${year}?${queryParams}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }
-      const newData = await res.json();
-      
+      const responseData = await res.json();
+
       if (append) {
-        setData(prevData => [...prevData, ...newData.data]);
+        setData(prevData => [...prevData, ...responseData.data]);
       } else {
-        setData(newData.data);
+        setData(responseData.data);
       }
       
-      setTotalCount(newData.count);
-      setHasMore(newData.data.length === pageSize);
-  
-      // Update remaining searches after successful data fetch
-      const searchLimitResponse = await fetch('/api/search-limit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user?.id }),
-      });
-      if (searchLimitResponse.ok) {
-        const searchLimitData = await searchLimitResponse.json();
-        setRemainingSearches(searchLimitData.remainingSearches);
-        setNextResetTime(new Date(searchLimitData.nextResetTime));
+      setTotalCount(responseData.count);
+      setHasMore(responseData.data.length === pageSize);
+      setRemainingSearches(responseData.remainingSearches);
+      setNextResetTime(new Date(responseData.nextResetTime));
 
-        // Show toast when remaining searches are low
-        if (searchLimitData.remainingSearches <= 10) {
-          toast({
-            title: "Low on searches",
-            description: (
-              <div>
-                You have {searchLimitData.remainingSearches} searches left. 
-                <Link href="/suggestions" className="ml-1 text-blue-500 hover:underline">
-                  Submit a suggestion
-                </Link> to get 30 more!
-              </div>
-            ),
-            duration: 10000, // Show for 10 seconds
-          });
-        }
+      // Show toast when remaining searches are low
+      if (responseData.remainingSearches <= 10) {
+        toast({
+          title: "Low on searches",
+          description: (
+            <div>
+              You have {responseData.remainingSearches} searches left. 
+              <Link href="/suggestions" className="ml-1 text-blue-500 hover:underline">
+                Submit a suggestion
+              </Link> to get 30 more!
+            </div>
+          ),
+          duration: 10000, // Show for 10 seconds
+        });
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -170,12 +129,11 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
     } finally {
       setIsLoading(false);
     }
-  }, [year, pageSize, checkSearchLimit, toast, user]);
-  
+  }, [year, pageSize, toast, user]);
 
   useEffect(() => {
-    fetchData(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
-  }, [currentPage, activeSearchTerm, fetchData, searchParams]);
+    fetchDataAndCheckLimit(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
+  }, [currentPage, activeSearchTerm, searchParams, fetchDataAndCheckLimit]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -183,18 +141,14 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
 
   const handleSearchSubmit = async (event: React.FormEvent, courseCode: string, category: string) => {
     event.preventDefault();
-    const canProceed = await checkSearchLimit();
-    if (canProceed) {
-      setActiveSearchTerm(searchTerm);
-      setCurrentPage(1);
-      fetchData(1, searchTerm, courseCode, category);
-      const queryParams = new URLSearchParams({
-        search: searchTerm,
-        courseCode: courseCode,
-        category: category
-      });
-      router.push(`?${queryParams.toString()}`, { scroll: false });
-    }
+    setActiveSearchTerm(searchTerm);
+    setCurrentPage(1);
+    fetchDataAndCheckLimit(1, searchTerm, courseCode, category);
+    const queryParams = new URLSearchParams({
+      search: searchTerm,
+      courseCode: courseCode,
+      category: category
+    });
   };
 
   return (
