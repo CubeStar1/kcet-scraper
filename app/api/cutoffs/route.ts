@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
 
   const rounds = {
     'Mock 1': 'm1',
+    'Mock 2': 'm2',
     'Round 1': 'r1',
     'Round 2': 'r2',
     'Round 3': 'r3'
