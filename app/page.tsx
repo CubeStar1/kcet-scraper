@@ -31,18 +31,18 @@ const Page = () => {
             <SearchInput />
           </div>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/cutoffs" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
+            {/* <Link href="/cutoffs" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Cutoffs
             </Link>
             <Link href="/student-profile" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Dashboard
-            </Link>
+            </Link> */}
             <Link href="/counselling" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Counselling
             </Link>
-            <Link href="/chat" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
+            {/* <Link href="/chat" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
               Chatroom
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

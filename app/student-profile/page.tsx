@@ -117,7 +117,7 @@ export default function StudentProfile() {
     try {
       let allData: CutoffData[] = [];
       for (const option of savedOptions) {
-        const res = await fetch(`/api/cutoffs?course=${option.courseCode}&categories=GM&round=Round 1`);
+        const res = await fetch(`/api/cutoffs?course=${option.courseCode}&categories=GM&year=2024&round=Mock 1`);
         if (!res.ok) throw new Error(`Failed to fetch cutoff data for ${option.courseCode}`);
         const data = await res.json();
         allData = [...allData, ...data];
