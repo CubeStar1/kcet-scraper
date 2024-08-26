@@ -175,7 +175,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
 
   useEffect(() => {
     fetchData(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
-  }, [currentPage, activeSearchTerm, searchParams]);
+  }, [currentPage, activeSearchTerm, fetchData, searchParams]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -193,6 +193,7 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
         courseCode: courseCode,
         category: category
       });
+      router.push(`?${queryParams.toString()}`, { scroll: false });
     }
   };
 
