@@ -153,6 +153,7 @@ const PaginatedTable = ({ year }: { year: string })  => {
       courseCode: courseCode,
       category: category
     });
+    router.push(`/counselling/${year}?${queryParams}`);
   };
 
   return (
