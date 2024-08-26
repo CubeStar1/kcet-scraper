@@ -30,12 +30,12 @@ export type TableData = {
   serial_number_allotted_option: string;
 }
 
-const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData: TableData[], initialTotalCount: number, year: string })  => {
+const PaginatedTable = ({ year }: { year: string })  => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState(initialData);
-  const [totalCount, setTotalCount] = useState(initialTotalCount);
+  const [data, setData] = useState<TableData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [activeSearchTerm, setActiveSearchTerm] = useState(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -130,6 +130,10 @@ const PaginatedTable = ({ initialData, initialTotalCount, year }: { initialData:
       setIsLoading(false);
     }
   }, [year, pageSize, toast, user]);
+
+  useEffect(() => {
+    fetchDataAndCheckLimit(1, '', '', '', false);
+  }, [fetchDataAndCheckLimit]);
 
   useEffect(() => {
     fetchDataAndCheckLimit(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
