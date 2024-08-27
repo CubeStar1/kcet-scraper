@@ -16,6 +16,16 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import TableSkeleton from './TableSkeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+
+import { Skeleton } from "@/components/ui/skeleton"
+
 
 export type TableData = {
   id: string;
@@ -26,9 +36,11 @@ export type TableData = {
   course_code: string;
   verified_category: string;
   category_allotted: string;
+  college_name: string;
   course_fee: string;
   serial_number_allotted_option: string;
   stream: string;
+  round: string;
 }
 
 const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, initialRound: string }) => {
@@ -49,6 +61,11 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const [selectedStream, setSelectedStream] = useState(searchParams.get('stream') || 'All Streams');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All Categories');
   const [selectedCourseCode, setSelectedCourseCode] = useState(searchParams.get('courseCode') || '');
+
+  const [selectedCetNo, setSelectedCetNo] = useState<string | null>(null);
+  const [candidateDetails, setCandidateDetails] = useState<TableData[] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const { toast } = useToast();
   const { data: user } = useUser();
@@ -133,6 +150,29 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
     }
   }, [selectedYear, selectedRound, toast, user]);
 
+  const fetchCandidateDetails = useCallback(async (cetNo: string) => {
+    setIsLoadingDetails(true);
+    try {
+      const rounds = ['m1', 'm2']; // Add more rounds as needed
+      const detailsPromises = rounds.map(round => 
+        fetch(`/api/data/${selectedYear}?search=${cetNo}&round=${round}&userId=${user?.id}`)
+          .then(res => res.json())
+          .then(data => ({ ...data.data[0], round }))
+      );
+      const details = await Promise.all(detailsPromises);
+      setCandidateDetails(details.filter(Boolean));
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load candidate details",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  }, [selectedYear, user, toast]);
+
   useEffect(() => {
     fetchDataAndCheckLimit(1, activeSearchTerm, selectedCourseCode, selectedCategory, selectedStream, false);
   }, [fetchDataAndCheckLimit, activeSearchTerm, selectedCourseCode, selectedCategory, selectedStream]);
@@ -178,6 +218,12 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
     setSelectedRound(round);
     setCurrentPage(1);
     setData([]);
+  };
+
+  const handleCetNoClick = (cetNo: string) => {
+    setSelectedCetNo(cetNo);
+    fetchCandidateDetails(cetNo);
+    setIsModalOpen(true);
   };
 
   return (
@@ -228,7 +274,15 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   ref={index === data.length - 1 ? lastElementRef : null}
                   data-state={row.id === "selected" && "selected"}
                 >
-                  <TableCell>{row.cet_no}</TableCell>
+                  <TableCell 
+                    className="cursor-pointer text-blue-500 underline hover:text-blue-600"
+                    onClick={() => handleCetNoClick(row.cet_no)}
+                  >
+                    <div className="flex items-center bg-secondary p-2 rounded-lg">
+                      <span>{row.cet_no}</span>
+                    </div>
+
+                  </TableCell>
                   <TableCell>{row.candidate_name}</TableCell>
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
@@ -251,8 +305,84 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
         </Table>
       </div>
       {isLoading && <TableSkeleton />}
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl w-full flex flex-col p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-4">
+              Candidate Details
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-grow overflow-y-auto px-4">
+            {isLoadingDetails ? (
+              <ModalSkeleton />
+            ) : candidateDetails ? (
+              <div className="space-y-6">
+                <div className="bg-secondary p-4 rounded-lg">
+                  <h2 className="text-xl font-semibold mb-2">CET No: {selectedCetNo}</h2>
+                  <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/6">Round</TableHead>
+                      <TableHead>Course Code</TableHead>
+                      <TableHead>Course</TableHead>
+                      <TableHead>College</TableHead>
+                      <TableHead>Rank</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Fee</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {candidateDetails.map((details, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{details.round.toUpperCase()}</TableCell>
+                        <TableCell>{details.course_code}</TableCell>
+                        <TableCell>{details.course_name}</TableCell>
+                        <TableCell>{details.college_name || 'N/A'}</TableCell>
+                        <TableCell>{details.rank}</TableCell>
+                        <TableCell>{details.category_allotted}</TableCell>
+                        <TableCell>{details.course_fee}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="bg-secondary p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+                  <p>Stream: {candidateDetails[0]?.stream}</p>
+                  <p>Verified Category: {candidateDetails[0]?.verified_category}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-lg text-gray-600">No details available for this candidate.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+const ModalSkeleton = () => (
+  <div className="space-y-6 animate-pulse">
+    <div className="bg-secondary p-4 rounded-lg">
+      <Skeleton className="h-6 w-3/4 mb-2" />
+      <Skeleton className="h-5 w-1/2" />
+    </div>
+    <div className="space-y-2">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+    </div>
+    <div className="bg-secondary p-4 rounded-lg">
+      <Skeleton className="h-5 w-3/4 mb-2" />
+      <Skeleton className="h-4 w-1/2 mb-1" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  </div>
+);
 
 export default PaginatedTable;
