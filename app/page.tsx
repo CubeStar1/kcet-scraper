@@ -12,7 +12,7 @@ const Page = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 px-6 max-w-7xl mx-auto">
       {/* Hero Section */}
       <div className="relative">
         <div className="absolute inset-0 backdrop-blur-sm" />

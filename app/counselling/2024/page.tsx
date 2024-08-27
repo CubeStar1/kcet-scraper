@@ -13,11 +13,11 @@ export default function Home() {
       <Card>
         <CardContent className='flex items-center mt-4'>
           <Info className="w-4 h-4 mr-2" />
-          Note: The data for mock round 2 is still being scraped, this is the data for mock round 1
+          Note: The data for mock round 2 is still being scraped, only partial data has been uploaded.
         </CardContent>
       </Card>
       <Suspense fallback={<TableSkeleton />}>
-        <PaginatedTable year="2024" />
+        <PaginatedTable initialYear="2024" initialRound="m2" />
       </Suspense>
     </main>
   )

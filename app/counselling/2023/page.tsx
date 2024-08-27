@@ -9,7 +9,7 @@ export default function Home() {
         Candidate Data: 2023 
       </h1>
       <Suspense fallback={<TableSkeleton />}>
-        <PaginatedTable year="2023" />
+        <PaginatedTable initialYear="2023" initialRound="r1" />
       </Suspense>
     </main>
   )

@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
   const courseCode = searchParams.get('courseCode') || '';
   const categoryAllotted = searchParams.get('category') || '';
   const userId = searchParams.get('userId') || '';
+  const round = searchParams.get('round') || 'm1';
+  const stream = searchParams.get('stream') || 'All Streams';
+
 
   const supabase = createRouteHandlerClient({ cookies });
 
@@ -71,8 +74,10 @@ export async function GET(request: NextRequest) {
       }, { status: 429 });
     }
 
+    const tableName = `kcet_2024_${round}_table`;
+    console.log(`tableName: ${tableName}`)
     let query = supabase
-      .from('kcet_2024_m1_table')
+      .from(tableName)
       .select('*', { count: 'exact' });
 
     // Apply filters
@@ -90,6 +95,10 @@ export async function GET(request: NextRequest) {
 
     if (categoryAllotted && categoryAllotted !== 'All Categories') {
       query = query.eq('category_allotted', categoryAllotted);
+    }
+
+    if (stream && stream !== 'All Streams') {
+      query = query.eq('stream', stream);
     }
 
     const { data, count, error } = await query

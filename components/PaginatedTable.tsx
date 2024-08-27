@@ -3,7 +3,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
+import SearchForm from './SearchForm';
+import { useToast } from "@/components/ui/use-toast";
+import useUser from '@/app/hook/useUser'; 
+import { formatDistanceToNow } from 'date-fns'; 
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,10 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import TableSkeleton from './TableSkeleton';
-import SearchForm from './SearchForm';
-import { useToast } from "@/components/ui/use-toast";
-import useUser from '@/app/hook/useUser'; 
-import { formatDistanceToNow } from 'date-fns'; 
 
 export type TableData = {
   id: string;
@@ -28,9 +28,10 @@ export type TableData = {
   category_allotted: string;
   course_fee: string;
   serial_number_allotted_option: string;
+  stream: string;
 }
 
-const PaginatedTable = ({ year }: { year: string })  => {
+const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, initialRound: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,13 +40,15 @@ const PaginatedTable = ({ year }: { year: string })  => {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [activeSearchTerm, setActiveSearchTerm] = useState(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingSearches, setRemainingSearches] = useState(60);
+  const [remainingSearches, setRemainingSearches] = useState(100);
   const [error, setError] = useState('');
   const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
   const [hasMore, setHasMore] = useState(true);
-
-  const pageSize = 20;
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const [selectedYear, setSelectedYear] = useState(initialYear);
+  const [selectedRound, setSelectedRound] = useState(initialRound);
+  const [selectedStream, setSelectedStream] = useState(searchParams.get('stream') || 'All Streams');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All Categories');
+  const [selectedCourseCode, setSelectedCourseCode] = useState(searchParams.get('courseCode') || '');
 
   const { toast } = useToast();
   const { data: user } = useUser();
@@ -62,7 +65,7 @@ const PaginatedTable = ({ year }: { year: string })  => {
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
 
-  const fetchDataAndCheckLimit = useCallback(async (page: number, search: string, courseCode: string, category: string, append: boolean = false) => {
+  const fetchDataAndCheckLimit = useCallback(async (page: number, search: string, courseCode: string, category: string, stream: string, append: boolean = false) => {
     if (!user) {
       toast({
         title: "Error",
@@ -76,18 +79,18 @@ const PaginatedTable = ({ year }: { year: string })  => {
     setError('');
 
     try {
-      // Check search limit and fetch data in a single API call
       const queryParams = new URLSearchParams({
         page: page.toString(),
-        pageSize: pageSize.toString(),
+        pageSize: '20',
         search: search,
         courseCode: courseCode,
         category: category,
-        userId: user.id
+        userId: user.id,
+        round: selectedRound,
+        stream: stream
       });
-      console.log(`queryParams: ${queryParams}`)
 
-      const res = await fetch(`/api/data/${year}?${queryParams}`);
+      const res = await fetch(`/api/data/${selectedYear}?${queryParams}`);
       if (!res.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -100,11 +103,10 @@ const PaginatedTable = ({ year }: { year: string })  => {
       }
       
       setTotalCount(responseData.count);
-      setHasMore(responseData.data.length === pageSize);
+      setHasMore(responseData.data.length === 20);
       setRemainingSearches(responseData.remainingSearches);
       setNextResetTime(new Date(responseData.nextResetTime));
 
-      // Show toast when remaining searches are low
       if (responseData.remainingSearches <= 10) {
         toast({
           title: "Low on searches",
@@ -116,7 +118,7 @@ const PaginatedTable = ({ year }: { year: string })  => {
               </Link> to get 30 more!
             </div>
           ),
-          duration: 10000, // Show for 10 seconds
+          duration: 10000,
         });
       }
     } catch (error) {
@@ -129,43 +131,67 @@ const PaginatedTable = ({ year }: { year: string })  => {
     } finally {
       setIsLoading(false);
     }
-  }, [year, pageSize, toast, user]);
+  }, [selectedYear, selectedRound, toast, user]);
 
   useEffect(() => {
-    fetchDataAndCheckLimit(1, '', '', '', false);
-  }, [fetchDataAndCheckLimit]);
+    fetchDataAndCheckLimit(1, activeSearchTerm, selectedCourseCode, selectedCategory, selectedStream, false);
+  }, [fetchDataAndCheckLimit, activeSearchTerm, selectedCourseCode, selectedCategory, selectedStream]);
 
   useEffect(() => {
-    fetchDataAndCheckLimit(currentPage, activeSearchTerm, searchParams.get('courseCode') || '', searchParams.get('category') || '', currentPage > 1);
-  }, [currentPage, activeSearchTerm, fetchDataAndCheckLimit]);
+    if (currentPage > 1) {
+      fetchDataAndCheckLimit(currentPage, activeSearchTerm, selectedCourseCode, selectedCategory, selectedStream, true);
+    }
+  }, [currentPage, activeSearchTerm, fetchDataAndCheckLimit, selectedCourseCode, selectedCategory, selectedStream]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = async (event: React.FormEvent, courseCode: string, category: string) => {
+  const handleSearchSubmit = async (event: React.FormEvent, courseCode: string, category: string, year: string, round: string, stream: string) => {
     event.preventDefault();
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
-    fetchDataAndCheckLimit(1, searchTerm, courseCode, category);
+    setSelectedYear(year);
+    setSelectedRound(round);
+    setSelectedStream(stream);
+    setSelectedCategory(category);
+    setSelectedCourseCode(courseCode);
+    fetchDataAndCheckLimit(1, searchTerm, courseCode, category, stream, false);
     const queryParams = new URLSearchParams({
       search: searchTerm,
       courseCode: courseCode,
-      category: category
+      category: category,
+      year: year,
+      round: round,
+      stream: stream
     });
     router.push(`/counselling/${year}?${queryParams}`);
   };
 
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    setCurrentPage(1);
+    setData([]);
+  };
+
+  const handleRoundChange = (round: string) => {
+    setSelectedRound(round);
+    setCurrentPage(1);
+    setData([]);
+  };
+
   return (
     <div>
-      <div className="flex flex-col justify-center items-center sm:flex-row mb-4">
-        <SearchForm 
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          onSearchSubmit={handleSearchSubmit}
-          isLoading={isLoading}
-        />
-      </div>
+      <SearchForm 
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        onSearchSubmit={handleSearchSubmit}
+        isLoading={isLoading}
+        selectedYear={selectedYear}
+        selectedRound={selectedRound}
+        onYearChange={handleYearChange}
+        onRoundChange={handleRoundChange}
+      />
       <div className="text-sm text-gray-500 mb-2">
         Remaining searches: {remainingSearches}
         {nextResetTime && (
@@ -178,8 +204,8 @@ const PaginatedTable = ({ year }: { year: string })  => {
         </Link>
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <div className="rounded-md">
-        <Table className="border-2 max-h-[500px] overflow-y-auto">
+      <div className="rounded-lg border">
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead>CET No</TableHead>
@@ -191,22 +217,36 @@ const PaginatedTable = ({ year }: { year: string })  => {
               <TableHead>Category Allotted</TableHead>
               <TableHead>Course Fee</TableHead>
               <TableHead>S. No. Allotted Option</TableHead>
+              <TableHead>Stream</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item: TableData, index: number) => (
-              <TableRow key={item.id} ref={index === data.length - 1 ? lastElementRef : null}>
-                <TableCell>{item.cet_no}</TableCell>
-                <TableCell>{item.candidate_name}</TableCell>
-                <TableCell>{item.rank}</TableCell>
-                <TableCell>{item.course_name}</TableCell>
-                <TableCell>{item.course_code}</TableCell>
-                <TableCell>{item.verified_category}</TableCell>
-                <TableCell>{item.category_allotted}</TableCell>
-                <TableCell>{item.course_fee}</TableCell>
-                <TableCell>{item.serial_number_allotted_option}</TableCell>
+            {data.length ? (
+              data.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  ref={index === data.length - 1 ? lastElementRef : null}
+                  data-state={row.id === "selected" && "selected"}
+                >
+                  <TableCell>{row.cet_no}</TableCell>
+                  <TableCell>{row.candidate_name}</TableCell>
+                  <TableCell>{row.rank}</TableCell>
+                  <TableCell>{row.course_name}</TableCell>
+                  <TableCell>{row.course_code}</TableCell>
+                  <TableCell>{row.verified_category}</TableCell>
+                  <TableCell>{row.category_allotted}</TableCell>
+                  <TableCell>{row.course_fee}</TableCell>
+                  <TableCell>{row.serial_number_allotted_option}</TableCell>
+                  <TableCell>{row.stream}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={10} className="h-24 text-center">
+                  No results.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
