@@ -83,7 +83,8 @@ export async function GET(request: NextRequest) {
     // Apply filters
     if (search) {
       if (isNaN(convertToNumber(search))) {
-        query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
+        // query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
+        query = query.or(`candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
       } else {
         query = query.or(`rank.gte.${convertToNumber(search)}`);
       }
@@ -93,9 +94,9 @@ export async function GET(request: NextRequest) {
       query = query.eq('course_code', courseCode);
     }
 
-    if (categoryAllotted && categoryAllotted !== 'All Categories') {
-      query = query.eq('category_allotted', categoryAllotted);
-    }
+    // if (categoryAllotted && categoryAllotted !== 'All Categories') {
+    //   query = query.eq('category_allotted', categoryAllotted);
+    // }
 
     if (stream && stream !== 'All Streams') {
       query = query.eq('stream', stream);

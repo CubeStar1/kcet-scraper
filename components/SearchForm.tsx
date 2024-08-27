@@ -91,7 +91,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         className="w-full"
         disabled={isLoading}
       />
-      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+      {/* <Select value={selectedCategory} onValueChange={setSelectedCategory}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
@@ -101,7 +101,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
             <SelectItem key={category} value={category}>{category}</SelectItem>
           ))}
         </SelectContent>
-      </Select>
+      </Select> */}
       <Select value={selectedStream} onValueChange={setSelectedStream}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Stream" />
