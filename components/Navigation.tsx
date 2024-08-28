@@ -28,14 +28,14 @@ const components = [
       { title: "Option Entry", href: "/option-entry" },
     ],
   },
-  {
-    title: "Resources",
-    subItems: [
-      { title: "Downtime", href: "/downtime" },
-      { title: "Rate Limits", href: "/rate-limits" },
-      { title: "Suggestions", href: "/suggestions" },
-    ],
-  },
+  // {
+  //   title: "Resources",
+  //   subItems: [
+  //     { title: "Downtime", href: "/downtime" },
+  //     { title: "Rate Limits", href: "/rate-limits" },
+  //     { title: "Suggestions", href: "/suggestions" },
+  //   ],
+  // },
   {
     title: "Community",
     subItems: [
@@ -51,10 +51,10 @@ const components = [
       { title: "Dashboard", href: "/student-profile" },
     ],
   },
-  {
-    title: "About",
-    href: "/about",
-  },
+  // {
+  //   title: "About",
+  //   href: "/about",
+  // },
 ]
 
 export function Navigation() {
