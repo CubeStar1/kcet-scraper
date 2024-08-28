@@ -255,12 +255,12 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
           <TableHeader>
             <TableRow>
               {/* <TableHead>CET No</TableHead> */}
-              <TableHead>Name</TableHead>
-              {/* <TableHead>Rank</TableHead> */}
+              {/* <TableHead>Name</TableHead> */}
+              <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
               <TableHead>Course Code</TableHead>
-              {/* <TableHead>Verified Category</TableHead>
-              <TableHead>Category Allotted</TableHead> */}
+              <TableHead>Verified Category</TableHead>
+              <TableHead>Category Allotted</TableHead>
               <TableHead>Course Fee</TableHead>
               <TableHead>S. No. Allotted Option</TableHead>
               <TableHead>Stream</TableHead>
@@ -283,12 +283,12 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                     </div>
 
                   </TableCell> */}
-                  <TableCell>{row.candidate_name}</TableCell>
-                  {/* <TableCell>{row.rank}</TableCell> */}
+                  {/* <TableCell>{row.candidate_name}</TableCell> */}
+                  <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
                   <TableCell>{row.course_code}</TableCell>
-                  {/* <TableCell>{row.verified_category}</TableCell>
-                  <TableCell>{row.category_allotted}</TableCell> */}
+                  <TableCell>{row.verified_category}</TableCell>
+                  <TableCell>{row.category_allotted}</TableCell>
                   <TableCell>{row.course_fee}</TableCell>
                   <TableCell>{row.serial_number_allotted_option}</TableCell>
                   <TableCell>{row.stream}</TableCell>
