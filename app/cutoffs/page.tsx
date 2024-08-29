@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { collegeCodes, colleges, CutoffData, categoryOptions } from '@/lib/colleges';
 import { ArrowUpDown } from 'lucide-react';
 
-const rounds = ['Mock 1','Mock 2', 'Round 1', 'Round 2', 'Round 3']
+const rounds = ['Mock 1','Mock 2', 'Provisional Round 1', 'Round 1', 'Round 2', 'Round 3']
 
 async function getCutoffData(filters: any) {
   const params = new URLSearchParams(filters);
@@ -30,7 +30,7 @@ async function getCutoffData(filters: any) {
 
 export default function Component() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['GM']);
-  const [selectedRounds, setSelectedRounds] = useState(['Mock 1']);
+  const [selectedRounds, setSelectedRounds] = useState(['Provisional Round 1']);
   const [cutoffData, setCutoffData] = useState<CutoffData[]>([]);
   const [loading, setLoading] = useState(false);
   const [college, setCollege] = useState('All');

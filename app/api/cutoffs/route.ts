@@ -18,9 +18,11 @@ export async function GET(request: NextRequest) {
   const rounds = {
     'Mock 1': 'm1',
     'Mock 2': 'm2',
+    'Provisional Round 1': 'pr1',
     'Round 1': 'r1',
     'Round 2': 'r2',
     'Round 3': 'r3'
+    
   } as { [key: string]: string };
 
   let query = supabase
