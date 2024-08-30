@@ -122,14 +122,14 @@ export default function Component() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-6 max-w-7xl">
       <h1 className="text-2xl font-bold mb-6">College Cutoff Search</h1>
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Note</CardTitle>
         </CardHeader>
         <CardContent>
           Cutoffs have only been provided for 2024 Mock Round 1, more will be added soon.
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Card>
         <CardHeader>

@@ -58,7 +58,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const [hasMore, setHasMore] = useState(true);
   const [selectedYear, setSelectedYear] = useState(initialYear);
   const [selectedRound, setSelectedRound] = useState(initialRound);
-  const [selectedStream, setSelectedStream] = useState(searchParams.get('stream') || 'All Streams');
+  const [selectedStream, setSelectedStream] = useState(searchParams.get('stream') || 'Engineering');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All Categories');
   const [selectedCourseCode, setSelectedCourseCode] = useState(searchParams.get('courseCode') || '');
 
@@ -153,7 +153,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const fetchCandidateDetails = useCallback(async (cetNo: string) => {
     setIsLoadingDetails(true);
     try {
-      const rounds = ['m1', 'm2']; // Add more rounds as needed
+      const rounds = ['m1', 'm2', 'pr1']; // Add more rounds as needed
       const detailsPromises = rounds.map(round => 
         fetch(`/api/data/${selectedYear}?search=${cetNo}&round=${round}&userId=${user?.id}`)
           .then(res => res.json())
@@ -254,7 +254,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
         <Table>
           <TableHeader>
             <TableRow>
-              {/* <TableHead>CET No</TableHead> */}
+              <TableHead>CET No</TableHead>
               {/* <TableHead>Name</TableHead> */}
               <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
@@ -274,7 +274,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   ref={index === data.length - 1 ? lastElementRef : null}
                   data-state={row.id === "selected" && "selected"}
                 >
-                  {/* <TableCell 
+                  <TableCell 
                     className="cursor-pointer text-blue-500 underline hover:text-blue-600"
                     onClick={() => handleCetNoClick(row.cet_no)}
                   >
@@ -282,7 +282,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                       <span>{row.cet_no}</span>
                     </div>
 
-                  </TableCell> */}
+                  </TableCell>
+                  <TableCell>{row.cet_no}</TableCell>
                   {/* <TableCell>{row.candidate_name}</TableCell> */}
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
@@ -320,7 +321,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
               <div className="space-y-6">
                 <div className="bg-secondary p-4 rounded-lg">
                   <h2 className="text-xl font-semibold mb-2">CET No: {selectedCetNo}</h2>
-                  <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>
+                  {/* <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p> */}
                 </div>
                 <Table>
                   <TableHeader>
