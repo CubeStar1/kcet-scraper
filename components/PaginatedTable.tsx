@@ -283,7 +283,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                     </div>
 
                   </TableCell>
-                  <TableCell>{row.cet_no}</TableCell>
+                  {/* <TableCell>{row.cet_no}</TableCell> */}
                   {/* <TableCell>{row.candidate_name}</TableCell> */}
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
