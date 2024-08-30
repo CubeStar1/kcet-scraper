@@ -68,7 +68,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const { toast } = useToast();
-  const { data: user } = useUser();
+  const { data: user, isLoading: userLoading } = useUser();
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback((node: HTMLTableRowElement | null) => {
@@ -104,7 +104,9 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
         category: category,
         userId: user.id,
         round: selectedRound,
-        stream: stream
+        stream: stream,
+        // Include candidate_name only for moderators
+        includeCandidateName: user.user_role === 'moderator' ? 'true' : 'false'
       });
 
       const res = await fetch(`/api/data/${selectedYear}?${queryParams}`);
@@ -255,7 +257,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
           <TableHeader>
             <TableRow>
               <TableHead>CET No</TableHead>
-              {/* <TableHead>Name</TableHead> */}
+              {user?.user_role === 'moderator' && <TableHead>Name</TableHead>}
               <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
               <TableHead>Course Code</TableHead>
@@ -281,10 +283,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                     <div className="flex items-center bg-secondary p-2 rounded-lg">
                       <span>{row.cet_no}</span>
                     </div>
-
                   </TableCell>
-                  {/* <TableCell>{row.cet_no}</TableCell> */}
-                  {/* <TableCell>{row.candidate_name}</TableCell> */}
+                  {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>}
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
                   <TableCell>{row.course_code}</TableCell>
@@ -297,7 +297,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={10} className="h-24 text-center">
+                <TableCell colSpan={user?.user_role === 'moderator' ? 11 : 10} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
@@ -321,7 +321,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
               <div className="space-y-6">
                 <div className="bg-secondary p-4 rounded-lg">
                   <h2 className="text-xl font-semibold mb-2">CET No: {selectedCetNo}</h2>
-                  {/* <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p> */}
+                  {user?.user_role === 'moderator' && <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>}
                 </div>
                 <Table>
                   <TableHeader>

@@ -3,6 +3,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 export interface User extends SupabaseUser {
   username?: string; // Optional because it comes from a LEFT JOIN
   user_role: 'user' | 'moderator' | 'admin';
+  // ... other properties ...
 }
 
 // ... other interfaces remain the same
