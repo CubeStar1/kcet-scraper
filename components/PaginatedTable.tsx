@@ -256,7 +256,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>CET No</TableHead>
+              {/* <TableHead>CET No</TableHead> */}
               {user?.user_role === 'moderator' && <TableHead>Name</TableHead>}
               <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
@@ -276,14 +276,14 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   ref={index === data.length - 1 ? lastElementRef : null}
                   data-state={row.id === "selected" && "selected"}
                 >
-                  <TableCell 
+                  {/* <TableCell 
                     className="cursor-pointer text-blue-500 underline hover:text-blue-600"
                     onClick={() => handleCetNoClick(row.cet_no)}
                   >
                     <div className="flex items-center bg-secondary p-2 rounded-lg">
                       <span>{row.cet_no}</span>
                     </div>
-                  </TableCell>
+                  </TableCell> */}
                   {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>}
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
