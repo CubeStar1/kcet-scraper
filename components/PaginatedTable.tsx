@@ -155,7 +155,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const fetchCandidateDetails = useCallback(async (cetNo: string) => {
     setIsLoadingDetails(true);
     try {
-      const rounds = ['m1', 'm2', 'pr1']; // Add more rounds as needed
+      const rounds = ['m1', 'm2', 'pr1', 'r1']; // Add more rounds as needed
       const detailsPromises = rounds.map(round => 
         fetch(`/api/data/${selectedYear}?search=${cetNo}&round=${round}&userId=${user?.id}`)
           .then(res => res.json())
@@ -256,7 +256,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
         <Table>
           <TableHeader>
             <TableRow>
-              {/* <TableHead>CET No</TableHead> */}
+              <TableHead>CET No</TableHead>
               {user?.user_role === 'moderator' && <TableHead>Name</TableHead>}
               <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
@@ -276,14 +276,14 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   ref={index === data.length - 1 ? lastElementRef : null}
                   data-state={row.id === "selected" && "selected"}
                 >
-                  {/* <TableCell 
+                  <TableCell 
                     className="cursor-pointer text-blue-500 underline hover:text-blue-600"
                     onClick={() => handleCetNoClick(row.cet_no)}
                   >
                     <div className="flex items-center bg-secondary p-2 rounded-lg">
                       <span>{row.cet_no}</span>
                     </div>
-                  </TableCell> */}
+                  </TableCell>
                   {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>}
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
@@ -307,8 +307,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
       </div>
       {isLoading && <TableSkeleton />}
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl w-full flex flex-col p-8">
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}> 
+        <DialogContent className="max-w-4xl max-h-[80vh] w-full flex flex-col p-8 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center mb-4">
               Candidate Details
@@ -323,7 +323,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   <h2 className="text-xl font-semibold mb-2">CET No: {selectedCetNo}</h2>
                   {user?.user_role === 'moderator' && <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>}
                 </div>
-                <Table>
+                <Table className="max-h-[50vh] overflow-y-auto">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-1/6">Round</TableHead>

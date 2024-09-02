@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { addHours } from 'date-fns';
 
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const categoryAllotted = searchParams.get('category') || '';
   const userId = searchParams.get('userId') || '';
 
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createSupabaseServer();
 
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;

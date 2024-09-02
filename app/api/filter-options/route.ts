@@ -1,12 +1,21 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 
-const streams = ['Engineering', 'Medical', 'Architecture'];
+const streams = [
+  'Engineering', 
+  'Medical', 
+  'Architecture',  
+  'ISMH', 
+  'B.Sc Nursing', 'B.Pharm', 'D.Pharm',  
+  'Agri(BSc Pract.)', 'BTech(Agri Eng)', 'Agri(Btech. Pract.)', 'Agri(Bsc)',
+  'Veter Sci', 'Veter Sci(Pract.)', 
+  'Food Sci','Food Sci(Pract.)'
+];
 
 
 export async function GET() {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createSupabaseServer();
   
 
   try {
