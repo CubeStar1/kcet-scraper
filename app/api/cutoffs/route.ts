@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const course = searchParams.get('course');
   const categories = searchParams.get('categories')?.split(',') || [];
   const kcetRank = searchParams.get('kcetRank');
-  const round = searchParams.get('round') || 'Mock1';
+  const round = searchParams.get('round') || 'Mock 1';
   const year = searchParams.get('year') || '2024';
 
   const rounds = {

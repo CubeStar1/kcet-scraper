@@ -12,6 +12,7 @@ import { createSupabaseBrowser } from "@/lib/supabase/client";
 import useUser from '../hook/useUser'
 import { useToast } from "@/components/ui/use-toast"
 import { ScrollArea } from '@/components/ui/scroll-area'
+import Link from 'next/link'
 
 const supabase = createSupabaseBrowser();
 
@@ -275,6 +276,12 @@ export default function Component() {
           Drag and drop the courses into the options you want to select.
           It is recommended to use a desktop or laptop for the best experience.
         </p>
+          <p className="text-sm text-muted-foreground pb-3">
+            Click here to go to the dashboard to view cutoffs for the selected courses.
+          </p>
+          <Button className="mb-4 w-full">
+            <Link href="/student-profile">Dashboard</Link>
+          </Button>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>

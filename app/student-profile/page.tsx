@@ -22,6 +22,7 @@ type StudentData = {
     course_name: string
     course_code: string
     category_allotted: string
+    verified_category: string  // Add this line
   }
 
 type SavedOption = {
@@ -56,19 +57,22 @@ export default function StudentProfile() {
 
   useEffect(() => {
     if (savedOptions.length > 0) {
-      fetchCutoffData()
+      fetchCutoffData(studentData?.verified_category || "GM")
     }
   }, [savedOptions, studentData])
 
   const fetchStudentData = async () => {
     try {
-      const res = await fetch(`/api/data/2024?search=${cetNo}`)
+      const res = await fetch(`/api/data/2024?search=${cetNo}&userId=${user?.id}`)
       if (!res.ok) throw new Error('Failed to fetch student data')
       const { data } = await res.json()
       if (data && data.length > 0) {
         setStudentData(data[0])
+        // Fetch cutoff data after setting student data
+        fetchCutoffData(data[0].verified_category)
       } else {
         setStudentData(null)
+        setCutoffData([])  // Clear cutoff data if no student data found
         toast({
           title: 'No data found',
           description: 'No student data found for the given CET number.',
@@ -113,11 +117,13 @@ export default function StudentProfile() {
     router.push('/option-entry')
   }
 
-  const fetchCutoffData = async () => {
+  const fetchCutoffData = async (category: string) => {
+    if (!category || savedOptions.length === 0) return;
+
     try {
       let allData: CutoffData[] = [];
       for (const option of savedOptions) {
-        const res = await fetch(`/api/cutoffs?course=${option.courseCode}&categories=GM&year=2024&round=Mock 1`);
+        const res = await fetch(`/api/cutoffs?course=${option.courseCode}&categories=${category}&year=2024&round=Mock 2`);
         if (!res.ok) throw new Error(`Failed to fetch cutoff data for ${option.courseCode}`);
         const data = await res.json();
         allData = [...allData, ...data];
@@ -127,7 +133,7 @@ export default function StudentProfile() {
       if (studentData) {
         allData = allData.map(cutoff => ({
           ...cutoff,
-          isPotential: cutoff.GM >= studentData.rank
+          isPotential: cutoff[category] as number >= studentData.rank
         }));
       }
       
@@ -157,13 +163,13 @@ export default function StudentProfile() {
       header: "Branch",
     },
     {
-      accessorKey: "GM",
-      header: "GM Cutoff",
+      accessorKey: studentData?.verified_category || "GM",
+      header: `${studentData?.verified_category || "GM"} Cutoff`,
       cell: ({ row }) => {
         const isPotential = row.original.isPotential;
         return (
           <div className={isPotential ? "font-bold text-green-600 bg-green-100 p-1 rounded" : ""}>
-            {row.getValue("GM")}
+            {row.getValue(studentData?.verified_category || "GM")}
           </div>
         );
       },
