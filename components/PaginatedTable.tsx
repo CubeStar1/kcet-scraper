@@ -36,7 +36,7 @@ export type TableData = {
   course_code: string;
   verified_category: string;
   category_allotted: string;
-  college_name: string;
+  college_name?: string;
   course_fee: string;
   serial_number_allotted_option: string;
   stream: string;
@@ -260,6 +260,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
               {/* {user?.user_role === 'moderator' && <TableHead>Name</TableHead>} */}
               <TableHead>Name</TableHead>
               <TableHead>Rank</TableHead>
+              <TableHead>College</TableHead>
               <TableHead>Course</TableHead>
               <TableHead>Course Code</TableHead>
               <TableHead>Verified Category</TableHead>
@@ -288,6 +289,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                   {/* {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>} */}
                   <TableCell>{row.candidate_name}</TableCell>
                   <TableCell>{row.rank}</TableCell>
+                  <TableCell>{row.college_name || 'N/A'}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
                   <TableCell>{row.course_code}</TableCell>
                   <TableCell>{row.verified_category}</TableCell>

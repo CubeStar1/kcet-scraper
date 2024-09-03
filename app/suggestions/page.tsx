@@ -7,12 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { addDays, startOfDay } from 'date-fns';
+import { User } from '@supabase/supabase-js';
 
 interface Suggestion {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
+  user: User;  // Add this line
 }
 
 export default function SuggestionsPage() {
@@ -21,15 +24,37 @@ export default function SuggestionsPage() {
   const { data: user } = useUser();
   const supabase = createSupabaseBrowser();
   const { toast } = useToast();
+  const [dailySuggestionCount, setDailySuggestionCount] = useState(0);
 
   useEffect(() => {
     fetchSuggestions();
-  }, []);
+    if (user) {
+      fetchDailySuggestionCount();
+    }
+  }, [user]);
+
+  async function fetchDailySuggestionCount() {
+    const today = startOfDay(new Date());
+    const tomorrow = addDays(today, 1);
+    
+    const { data, error } = await supabase
+      .from('suggestions')
+      .select('id')
+      .eq('user_id', user?.id)
+      .gte('created_at', today.toISOString())
+      .lt('created_at', tomorrow.toISOString());
+
+    if (error) {
+      console.error('Error fetching daily suggestion count:', error);
+    } else {
+      setDailySuggestionCount(data.length);
+    }
+  }
 
   async function fetchSuggestions() {
     const { data, error } = await supabase
       .from('suggestions')
-      .select('*')
+      .select('*, user:users(email)')  // Modified this line
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -55,13 +80,29 @@ export default function SuggestionsPage() {
       return;
     }
 
+    if (!newSuggestion.trim()) {
+      toast({
+        title: "Error",
+        description: "Suggestion cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (dailySuggestionCount >= 3) {
+      toast({
+        title: "Limit Reached",
+        description: "You've reached the daily limit of 3 suggestions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       // Insert the suggestion
       const { error: suggestionError } = await supabase
         .from('suggestions')
-        .insert({ content: newSuggestion, user_id: user.id });
-
-      if (suggestionError) throw suggestionError;
+        .insert({ content: newSuggestion.trim(), user_id: user.id });
 
       // Increase the user's search limit
       const response = await fetch('/api/search-limit', {
@@ -80,6 +121,7 @@ export default function SuggestionsPage() {
 
       setNewSuggestion('');
       fetchSuggestions();
+      setDailySuggestionCount(prevCount => prevCount + 1);
       toast({
         title: "Success",
         description: `Your suggestion has been submitted. Your remaining searches: ${data.remainingSearches}`,
@@ -114,9 +156,9 @@ export default function SuggestionsPage() {
             <Button 
               type="submit" 
               className="w-full"
-              disabled={!user}
+              disabled={!user || !newSuggestion.trim() || dailySuggestionCount >= 3}
             >
-              Submit Suggestion
+              Submit Suggestion ({3 - dailySuggestionCount} left today)
             </Button>
           </form>
         </CardContent>
@@ -128,7 +170,7 @@ export default function SuggestionsPage() {
             <CardContent className="pt-6">
               <p className="mb-2">{suggestion.content}</p>
               <p className="text-sm text-muted-foreground">
-                Submitted on {new Date(suggestion.created_at).toLocaleString()}
+                Submitted by {suggestion.user.email} on {new Date(suggestion.created_at).toLocaleString()}
               </p>
             </CardContent>
           </Card>

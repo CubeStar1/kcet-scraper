@@ -43,8 +43,8 @@ export default function RootLayout({
            shadow="0 0 10px #2299DD,0 0 5px #2299DD"
            />
           {children}
-          <Analytics />
           <Toaster />
+          <Analytics />
           <Script id="clarity-script" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
