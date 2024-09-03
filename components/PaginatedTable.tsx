@@ -257,7 +257,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
           <TableHeader>
             <TableRow>
               <TableHead>CET No</TableHead>
-              {user?.user_role === 'moderator' && <TableHead>Name</TableHead>}
+              {/* {user?.user_role === 'moderator' && <TableHead>Name</TableHead>} */}
+              <TableHead>Name</TableHead>
               <TableHead>Rank</TableHead>
               <TableHead>Course</TableHead>
               <TableHead>Course Code</TableHead>
@@ -284,7 +285,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                       <span>{row.cet_no}</span>
                     </div>
                   </TableCell>
-                  {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>}
+                  {/* {user?.user_role === 'moderator' && <TableCell>{row.candidate_name}</TableCell>} */}
+                  <TableCell>{row.candidate_name}</TableCell>
                   <TableCell>{row.rank}</TableCell>
                   <TableCell>{row.course_name}</TableCell>
                   <TableCell>{row.course_code}</TableCell>
@@ -321,7 +323,8 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
               <div className="space-y-6">
                 <div className="bg-secondary p-4 rounded-lg">
                   <h2 className="text-xl font-semibold mb-2">CET No: {selectedCetNo}</h2>
-                  {user?.user_role === 'moderator' && <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>}
+                  {/* {user?.user_role === 'moderator' && <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>} */}
+                  { <p className="text-lg">Name: {candidateDetails[0]?.candidate_name}</p>}
                 </div>
                 <Table className="max-h-[50vh] overflow-y-auto">
                   <TableHeader>
@@ -333,6 +336,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                       <TableHead>Rank</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Fee</TableHead>
+                      <TableHead>S No. Allotted Option</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -345,6 +349,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
                         <TableCell>{details.rank}</TableCell>
                         <TableCell>{details.category_allotted}</TableCell>
                         <TableCell>{details.course_fee}</TableCell>
+                        <TableCell>{details.serial_number_allotted_option}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
