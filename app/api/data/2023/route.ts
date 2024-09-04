@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
   const courseCode = searchParams.get('courseCode') || '';
   const categoryAllotted = searchParams.get('category') || '';
   const userId = searchParams.get('userId') || '';
+  const round = searchParams.get('round') || '';
 
   const supabase = createSupabaseServer();
 
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
       if (isNaN(convertToNumber(search))) {
         query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
       } else {
-        query = query.or(`rank.eq.${convertToNumber(search)}`);
+        query = query.or(`rank.gte.${convertToNumber(search)}`);
       }
     }
 

@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     // Apply filters
     if (search) {
       if (isNaN(convertToNumber(search))) {
-        query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
+        query = query.or(`cet_no.ilike.%${search}%,candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%,college_name.ilike.%${search}%`);
         // query = query.or(`candidate_name.ilike.%${search}%,course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
         // query = query.or(`course_name.ilike.%${search}%,course_code.ilike.%${search}%`);
 

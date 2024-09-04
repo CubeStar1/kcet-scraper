@@ -69,7 +69,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <SelectContent>
           <SelectItem value="2024">2024</SelectItem>
           <SelectItem value="2023">2023</SelectItem>
-          <SelectItem value="2022">2022</SelectItem>
         </SelectContent>
       </Select>
       <Select value={selectedRound} onValueChange={onRoundChange}>
