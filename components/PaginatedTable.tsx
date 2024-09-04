@@ -253,7 +253,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
       <div className="rounded-lg border">
-        <Table>
+        <Table className='select-none'>
           <TableHeader>
             <TableRow>
               <TableHead>CET No</TableHead>
