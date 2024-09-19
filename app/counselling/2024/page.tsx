@@ -17,7 +17,7 @@ export default function Home() {
         </CardContent>
       </Card>
       <Suspense fallback={<TableSkeleton />}>
-        <PaginatedTable initialYear="2024" initialRound="r1" />
+        <PaginatedTable initialYear="2024" initialRound="pr2" />
       </Suspense>
     </main>
   )

@@ -80,6 +80,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
           <SelectItem value="m2">Mock 2</SelectItem>
           <SelectItem value="pr1">Provisional Round 1</SelectItem>
           <SelectItem value="r1">Round 1</SelectItem>
+          <SelectItem value="pr2">Provisional Round 2</SelectItem>
         </SelectContent>
       </Select>
       <Input
