@@ -155,7 +155,7 @@ const PaginatedTable = ({ initialYear, initialRound }: { initialYear: string, in
   const fetchCandidateDetails = useCallback(async (cetNo: string) => {
     setIsLoadingDetails(true);
     try {
-      const rounds = ['m1', 'm2', 'pr1', 'r1', 'pr2']; // Add more rounds as needed
+      const rounds = ['m1', 'm2', 'pr1', 'r1', 'pr2', 'r3']; // Add more rounds as needed
       const detailsPromises = rounds.map(round => 
         fetch(`/api/data/${selectedYear}?search=${cetNo}&round=${round}&userId=${user?.id}`)
           .then(res => res.json())

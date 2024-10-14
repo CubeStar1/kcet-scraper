@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const courseCode = searchParams.get('courseCode') || '';
   const categoryAllotted = searchParams.get('category') || '';
   const userId = searchParams.get('userId') || '';
-  const round = searchParams.get('round') || 'm1';
+  const round = searchParams.get('round') || 'r3';
   const stream = searchParams.get('stream') || 'All Streams';
 
 

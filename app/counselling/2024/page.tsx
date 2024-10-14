@@ -13,11 +13,11 @@ export default function Home() {
       <Card>
         <CardContent className='flex items-center mt-4'>
           <Info className="w-4 h-4 mr-2" />
-          Note: Data Round 1 has been fully scraped and uploaded.
+          Note: Data for Round 3 has been fully scraped and uploaded.
         </CardContent>
       </Card>
       <Suspense fallback={<TableSkeleton />}>
-        <PaginatedTable initialYear="2024" initialRound="pr2" />
+        <PaginatedTable initialYear="2024" initialRound="r3" />
       </Suspense>
     </main>
   )
