@@ -14,6 +14,7 @@ export default function Home() {
         <CardContent className='flex items-center mt-4'>
           <Info className="w-4 h-4 mr-2" />
           Note: Data for Round 3 has been fully scraped and uploaded.
+          Join the Discord server and send your email ID to get access to the names.
         </CardContent>
       </Card>
       <Suspense fallback={<TableSkeleton />}>
