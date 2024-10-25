@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 
+const streams = [
+  'Engineering', 
+  'Medical', 
+  'Architecture',  
+  'ISMH', 
+  'B.Sc Nursing', 'B.Pharm', 'D.Pharm',  
+  'Agri(BSc Pract.)', 'BTech(Agri Eng)', 'Agri(Btech. Pract.)', 'Agri(Bsc)',
+  'Veter Sci', 'Veter Sci(Pract.)', 
+  'Food Sci','Food Sci(Pract.)'
+];
+
+
 export async function GET() {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createSupabaseServer();
+  
 
   try {
     const [{ data: courseCodes, error: courseError }, { data: categories, error: categoryError }] = await Promise.all([
@@ -16,7 +29,8 @@ export async function GET() {
 
     return NextResponse.json({
       courseCodes: courseCodes.map(item => item.code),
-      categories: categories.map(item => item.category)
+      categories: categories.map(item => item.category),
+      streams: streams
     });
   } catch (error) {
     console.error('Error fetching filter options:', error);

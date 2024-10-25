@@ -1,14 +1,14 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { addHours } from 'date-fns';
 
-const MAX_SEARCHES = 0;
-const RESET_INTERVAL = 24; // 4 hours
-const SUGGESTION_REWARD = 0;
+const MAX_SEARCHES = 100;
+const RESET_INTERVAL = 8; // 8 hours
+const SUGGESTION_REWARD = 10;
 
 export async function POST(request: Request) {
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = createSupabaseServer();
 
   // Get the user ID and action from the request body
   const { userId, action } = await request.json();

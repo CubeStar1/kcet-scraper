@@ -43,7 +43,7 @@ export default function Header() {
             <Navigation />
           </div>
           <div className="flex items-center gap-2">
-            <div className="sm:hidden">
+            <div className="md:hidden">
               <NavigationMobile />
             </div>
             <ModeToggle />

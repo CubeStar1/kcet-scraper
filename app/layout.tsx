@@ -30,7 +30,7 @@ export default function RootLayout({
         <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Header />
-          <DowntimeBanner />
+          {/* <DowntimeBanner /> */}
           <NextTopLoader
            color="#2299DD"
            initialPosition={0.08}
@@ -43,8 +43,8 @@ export default function RootLayout({
            shadow="0 0 10px #2299DD,0 0 5px #2299DD"
            />
           {children}
-          <Analytics />
           <Toaster />
+          <Analytics />
           <Script id="clarity-script" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){

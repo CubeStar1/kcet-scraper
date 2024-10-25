@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,64 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/data-table";
-import { ColumnDef } from "@tanstack/react-table";
+import { Column, ColumnDef } from "@tanstack/react-table";
+import TableSkeleton from '@/app/cutoffs/components/TableSkeleton';
+import { Toast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
+import { collegeCodes, colleges, CutoffData, categoryOptions } from '@/lib/colleges';
+import { ArrowUpDown } from 'lucide-react';
 
-export type CutoffData = {
-    'branch': string;
-    '1G': number;
-    '1K': number;
-    '1R': number;
-    '2AG'?: number;
-    '2AK'?: number;
-    '2AR'?: number;
-    '2BG'?: number;
-    '2BK'?: number;
-    '2BR'?: number;
-    '3AG'?: number;
-    '3AK'?: number;
-    '3AR'?: number;
-    '3BG'?: number;
-    '3BK'?: number;
-    '3BR'?: number;
-    'GM': number;
-    'GMK'?: number;
-    'GMR'?: number;
-    'SCG'?: number;
-    'SCK'?: number;
-    'SCR'?: number;
-    'STG'?: number;
-    'STK'?: number;
-    'STR'?: number;
-    college_code: string;
-    college_name: string;
-    [key: string]: string | number | undefined;
-}
-const categoryOptions = [
-  { value: 'GM', label: 'GM' },
-  { value: '1G', label: '1G' },
-  { value: '2AG', label: '2AG' },
-  { value: '2BG', label: '2BG' },
-  { value: '3AG', label: '3AG' },
-  { value: '3BG', label: '3BG' },
-  { value: 'SCG', label: 'SCG' },
-  { value: 'STG', label: 'STG' },
-  { value: 'GMK', label: 'GMK' },
-  { value: 'GMR', label: 'GMR' },
-  { value: 'SCK', label: 'SCK' },
-  { value: 'SCR', label: 'SCR' },
-  { value: 'STR', label: 'STR' },
-  { value: '1K', label: '1K' },
-  { value: '1R', label: '1R' },
-  { value: '2AK', label: '2AK' },
-  { value: '2AR', label: '2AR' },
-  { value: '3AK', label: '3AK' },
-  { value: '3AR', label: '3AR' },
-  { value: '2BK', label: '2BK' },
-  { value: '2BR', label: '2BR' },
-  { value: '3BK', label: '3BK' },
-  { value: '3BR', label: '3BR' },
-  { value: 'STK', label: 'STK' },
-];
+const rounds = ['Mock 1','Mock 2', 'Provisional Round 1', 'Round 1', 'Round 2', 'Round 3']
 
 async function getCutoffData(filters: any) {
   const params = new URLSearchParams(filters);
@@ -77,18 +27,18 @@ async function getCutoffData(filters: any) {
   return res.json();
 }
 
-export default function CutoffPage() {
+
+export default function Component() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['GM']);
-  const [selectedRound, setSelectedRound] = useState('Round 1');
-  const [showDetails, setShowDetails] = useState('RK');
+  const [selectedRounds, setSelectedRounds] = useState(['Provisional Round 1']);
   const [cutoffData, setCutoffData] = useState<CutoffData[]>([]);
   const [loading, setLoading] = useState(false);
   const [college, setCollege] = useState('All');
   const [course, setCourse] = useState('All');
-  const [district, setDistrict] = useState('All');
   const [kcetRank, setKcetRank] = useState('');
   const [showNewCourses, setShowNewCourses] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedYear, setSelectedYear] = useState('2024');
 
   const columns = useMemo(() => {
     const baseColumns: ColumnDef<CutoffData>[] = [
@@ -108,7 +58,17 @@ export default function CutoffPage() {
 
     const categoryColumns = selectedCategories.map(category => ({
       accessorKey: category,
-      header: `${category} Cutoff`,
+      header: ({ column }: { column: Column<CutoffData> }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+             {`${category} Cutoff`}
+            <ArrowUpDown className="ml-2 h-4 w-4 " />
+          </Button>
+        )
+      }
     }));
 
     return [...baseColumns, ...categoryColumns];
@@ -120,12 +80,11 @@ export default function CutoffPage() {
       const filters = {
         college,
         course,
-        district,
         categories: selectedCategories.join(','),
         kcetRank,
-        round: selectedRound,
-        showNewCourses: showNewCourses.toString(),
-        search: searchTerm
+        round: selectedRounds,
+        search: searchTerm,
+        year: selectedYear
       };
       const data = await getCutoffData(filters);
       setCutoffData(data);
@@ -144,29 +103,70 @@ export default function CutoffPage() {
   const handleApplyFilters = () => {
     fetchCutoffData();
   };
+  const handleRoundChange = (round: string) => {
+    setSelectedRounds(prev => 
+      prev.includes(round) ? prev.filter(r => r !== round) : [...prev, round]
+    )
+  }
+
+  const memoizedFetchCutoffData = useMemo(() => {
+    return () => {
+      fetchCutoffData();
+    };
+  }, [fetchCutoffData]);
+
+  useEffect(() => {
+    memoizedFetchCutoffData();
+  }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
+    <div className="container mx-auto px-4 py-8 space-y-6 max-w-7xl">
       <h1 className="text-2xl font-bold mb-6">College Cutoff Search</h1>
+      {/* <Card>
+        <CardHeader>
+          <CardTitle>Note</CardTitle>
+        </CardHeader>
+        <CardContent>
+          Cutoffs have only been provided for 2024 Mock Round 1, more will be added soon.
+        </CardContent>
+      </Card> */}
 
       <Card>
         <CardHeader>
           <CardTitle>Search Filters</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:space-x-4">
-            <Label>Show the details for</Label>
-            <RadioGroup defaultValue="RK" onValueChange={setShowDetails} className="flex space-x-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="RK" id="RK" />
-                <Label htmlFor="RK">RK</Label>
+
+
+        <div className="space-y-2">
+            <Label>Select year and rounds</Label>
+            <div className="flex flex-wrap flex-col w-full gap-4 items-center sm:flex-row sm:items-start justify-start">
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['2024', '2023'].map(year => (
+                    <SelectItem key={year} value={year}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex justify-between w-full">
+              {rounds.map(round => (
+                <div key={round} className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={round} 
+                    checked={selectedRounds.includes(round)}
+                    onCheckedChange={() => handleRoundChange(round)}
+                  />
+                  <label htmlFor={round} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {round}
+                  </label>
+                </div>
+              ))}
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="HK" id="HK" />
-                <Label htmlFor="HK">HK</Label>
-              </div>
-            </RadioGroup>
-          </div>
+            </div> 
+          </div> 
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Select value={college} onValueChange={setCollege}>
@@ -175,7 +175,9 @@ export default function CutoffPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Colleges</SelectItem>
-                {/* Add college options dynamically */}
+                {colleges.map(college => (
+                  <SelectItem value={college} key={college}>{college}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -185,17 +187,12 @@ export default function CutoffPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Courses</SelectItem>
-                {/* Add course options dynamically */}
-              </SelectContent>
-            </Select>
-
-            <Select value={district} onValueChange={setDistrict}>
-              <SelectTrigger>
-                <SelectValue placeholder="District - All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Districts</SelectItem>
-                {/* Add district options dynamically */}
+                {collegeCodes.map( (code) =>
+                (
+                  <SelectItem value={code} key={code}>{code}</SelectItem>
+                )
+                )
+              }
               </SelectContent>
             </Select>
 
@@ -204,12 +201,13 @@ export default function CutoffPage() {
               placeholder="KCET Rank" 
               value={kcetRank} 
               onChange={(e) => setKcetRank(e.target.value)}
+              className='w-full'
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Select Categories to Display</Label>
-            <div className="flex flex-wrap gap-2">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Select Categories to Display</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
               {categoryOptions.map((category) => (
                 <div key={category.value} className="flex items-center space-x-2">
                   <Checkbox
@@ -229,45 +227,14 @@ export default function CutoffPage() {
             </div>
           </div>
 
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-            <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:space-x-4">
-              <Label>Filter based on 2023 Cutoffs</Label>
-              <RadioGroup defaultValue="Round 1" onValueChange={setSelectedRound} className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Round 1" id="round1" />
-                  <Label htmlFor="round1">Round 1</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Round 2" id="round2" />
-                  <Label htmlFor="round2">Round 2</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Ext. Round" id="extRound" />
-                  <Label htmlFor="extRound">Ext. Round</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Mock Round Cutoff-24" id="mockRound" />
-                  <Label htmlFor="mockRound">Mock Round Cutoff-24</Label>
-                </div>
-              </RadioGroup>
-            </div>
+          
 
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="newCourses" 
-                checked={showNewCourses}
-                onCheckedChange={(checked) => setShowNewCourses(checked as boolean)}
-              />
-              <Label htmlFor="newCourses">Show ONLY new courses in 2024</Label>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between mb-4 sm:flex-row">
+          <div className="flex flex-col justify-between mb-4 sm:flex-row gap-4">
             <Input
               placeholder="Search by college name, course..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="max-w-lg"
+              className="max-w-full"
             />
             <Button onClick={handleApplyFilters}>Apply Filters</Button>
           </div>
@@ -280,7 +247,7 @@ export default function CutoffPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p>Loading cutoff data...</p>
+            <TableSkeleton />
           ) : (
             <>
               <DataTable columns={columns} data={cutoffData} />

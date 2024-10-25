@@ -67,3 +67,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}

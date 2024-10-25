@@ -16,48 +16,45 @@ import {
 
 const components = [
   {
-    title: "Downtime",
-    href: "/downtime",
+    title: "Home",
+    href: "/",
+  },
+  {
+    title: "Counselling",
     subItems: [
-      { title: "2024", href: "/downtime" },
+      { title: "2023", href: "/counselling/2023" },
+      { title: "2024", href: "/counselling/2024" },
+      { title: "Cutoffs", href: "/cutoffs" },
+      { title: "Option Entry", href: "/option-entry" },
+    ],
+  },
+  // {
+  //   title: "Resources",
+  //   subItems: [
+  //     { title: "Downtime", href: "/downtime" },
+  //     { title: "Rate Limits", href: "/rate-limits" },
+  //     { title: "Suggestions", href: "/suggestions" },
+  //   ],
+  // },
+  {
+    title: "Community",
+    subItems: [
+      // { title: "Chat", href: "/chat" },
+      { title: "Discord", href: "https://discord.gg/9ZqC3Mr5TK", external: true },
+    ],
+    external: true,
+  },
+  {
+    title: "Account",
+    subItems: [
+      { title: "Profile", href: "/profile" },
+      { title: "Dashboard", href: "/student-profile" },
     ],
   },
   // {
   //   title: "About",
   //   href: "/about",
   // },
-  // {
-  //   title: "Account",
-  //   href: "/profile",
-  // },
-  // {
-  //   title: "Counselling",
-  //   href: "/counselling",
-  //   subItems: [
-  //     { title: "2023", href: "/counselling/2023" },
-  //     { title: "2024", href: "/counselling/2024" },
-  //   ],
-  // },
-  // {
-  //   title: "Suggestions",
-  //   href: "/suggestions",
-  // },
-  {
-    title: "Discord",
-    href: "https://discord.gg/9ZqC3Mr5TK", // Replace with your actual Discord invite link
-    external: true, // Add this property to indicate it's an external link
-  },
-  // {
-  //   title: "Rate Limits",
-  //   href: "/rate-limits",
-  // },
-  // {
-  //   title: "Cutoffs",
-  //   href: "/cutoffs",
-  // },
-  
-
-
 ]
 
 export function Navigation() {
