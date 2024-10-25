@@ -2,6 +2,8 @@
 
 This is a [Next.js](https://nextjs.org/) website for scraping and presenting KCET (Karnataka Common Entrance Test) counselling results.
 
+![Screenshot](https://github.com/CubeStar1/kcet-scraper/blob/main/public/kcet-scraper-landing.jpg)
+
 ## Project Overview
 
 KCET-Scraper is a tool that:
